@@ -1,5 +1,15 @@
 # Resume Point — career-ops session (updated 2026-07-01)
 
+## 🆕 SESSION 2026-07-01 (later) — Apple applications: polished + filling in progress
+- **Both Apple packages polished & ready to submit.** Covers regenerated (fixed double-comma defects, added "Dear Hiring Manager," salutation, dated 2026-07-01). **FIB-SEM added** everywhere after user confirmed the experience: `cv.md` (skills line + UT Austin interfacial-FA bullet, "FIB-SEM cross-sectioning with EDS"), both CV PDFs, both forms' skill lists.
+- **Current upload files (dated 2026-07-01; old 06-27 CV PDFs deleted):**
+  - Characterization (req 200667077, Santa Clara): `output/cv-zezhou-guo-apple-characterization-2026-07-01.pdf` + `output/apple-battery-materials-characterization-engineer-cover.pdf`
+  - Reliability (req 200668468, San Diego): `output/cv-zezhou-guo-apple-reliability-2026-07-01.pdf` + `output/apple-battery-reliability-engineer-cover.pdf`
+- **STATUS: user is completing the forms manually.** Both live (verified 2026-07-01; comp bands Reliability $142.3–263.3K, Characterization $175.5–263.8K). Neither submitted yet → still `Evaluated` in tracker. Mark **Applied** once user confirms submission.
+- **Blockers hit this session:** (1) Chrome MCP disconnected mid-form once (Step-2 edits lost — Apple only persists on "Continue"); (2) browser `file_upload` no longer accepts host paths → **user must upload CVs/covers themselves**. I gave a full field-by-field checklist for both apps (contact, address=Austin TX 78745, 4 employment entries w/ descriptions, work-auth = authorized-now-F1-OPT / needs-sponsorship=Yes, skills).
+- **Data-contract note:** parser scrambles employment; correct order = Versa (Sr Materials Eng, current, Feb 2026)→UT Austin GRA (Jun 2021–Oct 2025)→HUST-Wuxi Battery Cell Eng (Jul 2020–May 2021)→HUST Research Asst (Mar 2017–Jun 2020).
+- ⚠️ Caught: the characterization app initially had the WRONG CV (reliability) attached — flagged for user to ensure correct CV per role.
+
 ## 🆕 SESSION 2026-07-01 — Cross-industry pipeline tackled (Tier 1 + Intel/Micron)
 Verified live reqs + evaluated the 5 recommended cross-industry targets. **Verdict: cross-industry semiconductor is a weaker vein than battery — no 4.0+ found. Battery shortlist (Tesla NMC 012, Cell Electrolyte 017, Apple 014/015) remains the priority.**
 - **Intel — Process Integration Dev Engineer, Defect Metrology (Hillsboro, JR0285193) → 3.8/5 → reports/019. BEST cross-industry fit.** Min-quals = his exact profile (PhD MatSci + materials characterization + DOE); $115–219K; "Position of Trust: N/A" (not export-gated). Below apply line on semi-process gap + ⚠️ Intel's 25K-role 2025-26 layoffs. **Apply only if willing to pivot into semi.**
