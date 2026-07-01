@@ -8,7 +8,12 @@ Verified live reqs + evaluated the 5 recommended cross-industry targets. **Verdi
 - **NXP → NO viable US req.** Physical FA is all Kuala Lumpur; Austin = design/EE/SW/test only. No report.
 - **Samsung Austin → NO fitting senior req.** Austin openings are fab process/equipment/mfg/data-science/technician; FA is technician-level. No report.
 - **Method note for next time:** Workday sites (Intel) + Oracle-CE (TI) expose zero-token JSON APIs for both liveness AND full JD — far faster/cheaper than browser. Intel CXS: `POST intel.wd1.myworkdayjobs.com/wday/cxs/intel/External/jobs`. TI: `edbz.fa.us2.oraclecloud.com/hcmRestApi/.../recruitingCEJobRequisitions?finder=findReqs;siteNumber=CX_1001,keyword=...`. NXP: `nxp.wd3.myworkdayjobs.com/wday/cxs/nxp/careers/jobs`. Search-result numeric URLs are often stale — verify via API/live board.
-- Tracker now 20 entries (018/019/020 merged); `verify-pipeline` clean. Tier 3 (Corning/Entegris/3M/Coherent) + KLA/AMAT/GlobalFoundries NOT yet touched (user scoped to Tier1+Intel/Micron this pass).
+- **FULL SWEEP COMPLETED (2026-07-01, 2nd pass): Tier 2/3 remainder done.** Tracker now 23 entries; `verify-pipeline` clean. New reports:
+  - **3M — Senior Materials Scientist (Maplewood, R01165600) → 3.6/5 → reports/021 (tracker #23). BEST Tier-3 fit** (ceramics/non-metallic materials dev = his cathode-oxide synthesis). Also 3M Sr X-ray Scientist ~3.3. Apply if broadening to general materials R&D + sponsorship confirmed.
+  - **Entegris — Research Scientist Analytical R&D (Aurora IL, REQ-11623) → 3.1/5 → reports/022 (tracker #22).** NMR/colloids/polymers emphasis — not his inorganic core. Recommend against.
+  - **KLA ~2.9** (tool-maker, apps/sales roles — no report), **AMAT ALD Materials Scientist ~3.0** (actually process eng — no report), **GlobalFoundries SKIP** (FA technician-level + US-foundry export-control — no report), **Corning + Coherent** ATS unresolved/deprioritized (comp floor / defense export — no report).
+  - **Numbering:** merge-tracker initially assigned 3M to row #23 (leaving a gap at #21); corrected 3M to row #21 so tracker rows are contiguous 1–22 and every row# matches its report# (18→018 … 22→022). verify-pipeline clean.
+- **FINAL CONCLUSION: cross-industry (semiconductor + general materials) fully explored — nothing ≥4.0. Battery shortlist wins decisively.** Tesla NMC 012 (4.6, via friend referral) + Cell Electrolyte 017 (4.1) + Apple 014/015 (4.1/4.2) remain the priority. Pursue any cross-industry role only as a deliberate pivot with sponsorship + export-control confirmed.
 
 ---
 
