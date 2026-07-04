@@ -1,4 +1,69 @@
-# Resume Point — career-ops session (updated 2026-07-01)
+# Resume Point — career-ops session (updated 2026-07-03)
+
+## 🆕 CHECKPOINT 2026-07-03 (latest) — INTEL #19 APPLIED ✅ (co-filled Workday)
+- **Intel Defect Metrology (JR0285193, 3.8) SUBMITTED 2026-07-03** via Workday "Autofill with Resume". Co-filled experience/education/legal questionnaire in-session; user signed in, uploaded résumé, clicked Submit. Tracker #19 Evaluated→Applied; Application Log appended to reports/019. verify-pipeline clean.
+- **Workday autofill gotchas (reuse for Micron/3M/Entegris — all Workday):** (1) autofill stuffs full bullet sets + junk into each Role Description textarea — UT Austin had illegal `"` quotes (Workday rejects `< > [ ] " { } \`), HUST had a "SELECTED PUBLICATIONS" block; clean them. (2) JS `.value` setter does NOT commit to Workday React state (validation sees empty) → use **real keystrokes** (`type`) for required text fields. (3) blank HUST degree needs manual set → Bachelors. (4) window resizes 1470↔1568 cause coordinate drift → screenshot before each click.
+- **Intel/Workday immigration branch (F-1 OPT answers):** Q9 export-control=No→Q9a citizenship=China; Q10 auth=Yes; Q11 sponsorship=Yes→Q11a J-1/J-2=No, Q11b "I do not have an I-140", Q11c 24+ months (12 OPT+24 STEM per form), Q11d F-1 OPT, Q11e field=Materials Science and Engineering. User-confirmed: Q4/Q5/Q8=No, citizenship=China, J-1/J-2=No.
+- **Cover NOT attached** (Intel Workday had only a Resume/CV slot, no Additional Documents). Follow-up: confirm export-control + STEM-PhD H-1B sponsorship w/ recruiter; negotiate off ~$167K mid ($115K floor < $130K target).
+- **REMAINING to submit (packages built, status Evaluated):** Micron #18, 3M #21, Entegris #22, ONE #11 (⚠️ confirm export/sponsorship/runway first), Tesla Cell Electrolyte #17 (re-verify req 265142 first). Chrome extension IS connected — can co-fill any same as Intel.
+
+## CHECKPOINT 2026-07-03 — Tesla targeted scan COMPLETED (state API); reports 024–026
+
+**Trigger:** user asked for a targeted Apple+Tesla scan (official careers pages) → evaluate via pipeline mode → fit reports. Browser (Playwright MCP) was available this session, unblocking the Tesla check that failed earlier.
+
+**Key capability unlocked:** Tesla careers **state API works zero-token from inside the browser** — `browser_evaluate` → `fetch('/cua-api/apps/careers/state')` returns ~7125 live listings (`id`=req, `t`=title, `l`=locId; resolve loc via `geo[].sites[].states[].cities{City:[ids]}`). Bypasses the Akamai WAF that 403s curl/WebFetch. Absent from this API = DEAD (authoritative). Correct job URL slug = `{kebab-title}-{id}`; a slug that redirects to `/careers/search` is dead.
+
+**Findings:**
+- **All 6 prior WebSearch "pending" Tesla reqs = DEAD** (226211/238223/229226/269925/123555/59050) + 265399 dead. Stale Google cache, as cautioned.
+- **3 net-new R&D roles evaluated (reports 024–026, tracker #24/#25/#26; next report # = 027):**
+  | # | Role (req) | Loc | Score | Verdict |
+  |---|-----------|-----|-------|---------|
+  | 024 | Sr. Materials Engineer, **Cell Materials Qualification** (268108) | Palo Alto | **4.4** | **APPLY** — active-materials team (same as 012/013); cross-talk RCA = his Adv Mater 2026 signature |
+  | 025 | Sr. Materials Engineer, **Cell Dry Electrode Development** (275152) | Louisville CO | 3.7 | polymer-binder rheology/DMA/extrusion = real gap; apply only if pivoting to electrode processing |
+  | 026 | Materials Engineer, **Cell Electrode** (275726) | Austin (local) | 3.2 | actually Manufacturing process-dev; recommend against for R&D |
+- Standing shortlist reqs reconfirmed live: 273839(012)/273838(013)/272730(016)/265142(017). 268094 (Austin cathode-mixing ~3.3) live, triage-only.
+- **Apple:** nothing net-new in-domain beyond #023. Only new adjacent hit (Silicon Char Eng 200669535) = Livorno ITALY + power-mgmt EE → out of scope.
+
+**State saved:** reports 024–026 written; tracker merged (26 entries) + verify-pipeline clean (0/0); pipeline.md + scan-history.tsv updated; JDs in `jds/tesla-*.md`. **PDFs NOT generated** (reports only, per request) — all 3 status `Evaluated`.
+
+**⚠️ merge-tracker GOTCHA (fixed):** it fuzzy-matched new #024 onto existing #17 (both "Tesla — Sr. Materials Engineer, … (Palo Alto)") and OVERWROTE the Cell Electrolyte row. Repaired by hand (#17 restored, #24 added). **Always `grep` the tracker after merging Tesla "Sr. Materials Engineer, X (Palo Alto)" roles — they collide.**
+
+**NEXT:** #024 is the standout (3rd seat on the 012/013 cathode team — coordinate which req to emphasize, don't blanket-apply). If user wants, build the #024 package (tailored CV + cover). Career-ops update v1.14.0→v1.16.0 available (data-safe), not yet applied.
+
+---
+
+## 🆕 SESSION 2026-07-03 — 5 cross-industry packages BUILT (user override, "volume/safety net")
+User explicitly chose to build application packages for **all 5 sub-4.0 cross-industry roles** despite the recommend-against guidance, framed as a volume/safety-net widening (keep battery-scientist identity; bridge the transferable characterization/RCA/DOE toolkit to each role — NOT a full semi repositioning). Intent logged: they know these are below the 4.0 line, including ONE's export/going-concern risk.
+
+**All 5 reqs re-verified LIVE 2026-07-03 via zero-token APIs** (before building):
+- Intel JR0285193 (Workday CXS `intel/External`) — Posted 7 days, Hillsboro OR ✅
+- 3M R01165600 (`3m/Search`) — 30+ days, Maplewood MN ✅
+- Entegris REQ-11623 (`entegris/EntegrisCareers`) — 30+ days, Aurora IL ✅
+- Micron JR92813 (`micron/External` Workday CXS — Micron IS on Workday; careers.micron.com Eightfold front blocks `/api/apply`) — 30+ days, Boise ID ✅
+- ONE (UltiPro `OUR1002ONXE` LoadSearchResults POST, opportunityId 3de26df5…) — Electrochemistry Development Scientist ✅
+
+**Packages COMPLETE in output/ (all dated 2026-07-03; CVs 2pp, covers 1pp; pypdf-verified clean, 0 keyword-scramble):**
+| # | Role | CV PDF | Cover PDF |
+|---|------|--------|-----------|
+| 19 | Intel Defect Metrology | `cv-zezhou-guo-intel-defect-metrology-2026-07-03.pdf` | `intel-defect-metrology-cover.pdf` |
+| 18 | Micron HBM PYE FA | `cv-zezhou-guo-micron-hbm-fa-2026-07-03.pdf` | `micron-hbm-pye-fa-cover.pdf` |
+| 21 | 3M Sr Materials Scientist | `cv-zezhou-guo-3m-senior-materials-scientist-2026-07-03.pdf` | `3m-senior-materials-scientist-cover.pdf` |
+| 11 | ONE Electrochem Dev Scientist | `cv-zezhou-guo-one-echem-scientist-2026-07-03.pdf` | `one-electrochemistry-development-scientist-cover.pdf` |
+| 22 | Entegris Research Sci Analytical R&D | `cv-zezhou-guo-entegris-analytical-rd-2026-07-03.pdf` | `entegris-research-scientist-analytical-rd-cover.pdf` |
+
+**Tailoring approach (per each report's Section E):** Intel/Micron/Entegris → lead with characterization + AI/DOE + FA toolkit; 3M → lead with synthesis/ceramics/scale-up; ONE → battery-native, foreground echem depth + SQL data platform (the JD's two-part mandate). **Covers own each gap honestly:** Intel/Micron name the semi-process/device-FA ramp; 3M names the product-domain distance; Entegris does NOT overstate NMR (framed as growth area — source-of-truth rule); **sponsorship deliberately OMITTED from all covers (raise on the call, per the SES playbook).**
+- Tracker: PDF column flipped ❌→✅ for 11/18/19/21/22; **status stays `Evaluated` (nothing submitted).** verify-pipeline clean.
+- **Humanizer pass applied to all 6 packages (5 above + 017):** removed every em/en dash from prose (cover openings/profiles/problems, CV summaries, the `Role — Company` headers → "at Company", the education `Degree — School` separator → "·"), killed a couple of forced restate-the-opening triads. Achievement bullets left verbatim (source-of-truth). All 12 deliverable PDFs verified em/en-dash-free in extracted text (ATS normalizer also converts date-range en dashes to hyphens).
+- **017 Tesla Cell Electrolyte (Palo Alto) REBUILT 2026-07-03** (humanized + **all 13 publications**, not the prior 5-selected): `output/cv-zezhou-guo-tesla-cell-electrolyte-2026-07-03.pdf` (3pp, full Publications section rendered LAST to match cv.md section order — the validator enforces this) + `output/tesla-cell-electrolyte-cover.pdf` (rebuilt on the batch template: Dear Hiring Manager + achievements + Sincerely). **Old 2026-06-30 CV deleted;** report 017 PDF header updated. gen-cvs.mjs now supports `allPubs:true` (ALLPUBS = 13 full citations, own name bolded, page-range en-dashes→hyphens).
+- Reusable generators rebuilt in scratchpad (ephemeral): `gen-cvs.mjs` + `gen-covers.mjs` (reuse the ATS-clean `<style>` block from the Apple char CV; content reproducible from cv.md + reports 011/018/019/021/022).
+- **Submission cribsheets written → `output/submission-cribsheets-2026-07-03.md`** (all 6 roles: apply URLs, exact files to upload, shared answers = contact/address/work-auth/employment-order, per-role comp + sponsorship/export notes, shared Workday flow). Micron apply URL = `micron.wd1.myworkdayjobs.com/en-US/External/job/Boise-ID---Main-Site/Staff-HBM-PYE-PDFA-Engineer_JR92813`.
+- **NEXT (resume here): user reviews the PDFs, then submits.** Suggested order: Intel (freshest, 7d) → Micron/3M/Entegris → 017 Tesla (re-verify req 265142 live first). **ONE #11 = do NOT submit blind — confirm export-control/ITAR + sponsorship + runway with recruiter first.** Confirm sponsorship/export with each recruiter early. Flip status Evaluated→Applied per role once submitted + append an Application Log section to each report (docs/fields/legal answers, like Apple 014/015).
+- **Browser submission blocked this env:** claude-in-chrome extension NOT connected (tabs_context_mcp → "extension is not connected"). Even connected, account sign-in + final Submit are user-only. Offer: once connected + user signed into a form, co-fill fields and STOP before submit.
+- ⚠️ Env note: zsh does NOT word-split unquoted `$var` — the `for pair in "a b"; set -- $pair` idiom failed; run per-file commands or use arrays.
+
+---
+
+# (prior checkpoint) Resume Point — career-ops session (updated 2026-07-01)
 
 ## 🆕 SESSION 2026-07-01 (later) — Apple applications: polished + filling in progress
 - **Both Apple packages polished & ready to submit.** Covers regenerated (fixed double-comma defects, added "Dear Hiring Manager," salutation, dated 2026-07-01). **FIB-SEM added** everywhere after user confirmed the experience: `cv.md` (skills line + UT Austin interfacial-FA bullet, "FIB-SEM cross-sectioning with EDS"), both CV PDFs, both forms' skill lists.
