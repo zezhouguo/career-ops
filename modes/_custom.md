@@ -30,7 +30,7 @@
      - Cap each batch run at 20 listings unless I say otherwise.
      - If a report scores below 6, skip the cover letter. -->
 
-(none yet -- add yours above)
+- **Language: converse in Chinese, produce documents in English.** All chat replies, explanations, and questions to me should be in Chinese (中文). But every created work-product stays in English regardless of chat language: CVs, cover letters, application-form answers, recruiter/outreach emails, reports, the tracker (`data/applications.md`), and any file content. (Rationale: US-based, English-language job search — documents must be in English to be usable.)
 
 ## Custom Workflows
 
