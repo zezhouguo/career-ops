@@ -1,3 +1,11 @@
 # report	pdf	html	format	date — written by generate-pdf.mjs, do not edit
 012	output/cv-zezhou-guo-tesla-nmc-2026-06-29.pdf	output/cv-zezhou-guo-tesla-nmc-2026-06-29.html	a4	2026-07-06
 017	output/cv-zezhou-guo-tesla-cell-electrolyte-2026-07-03.pdf	output/cv-zezhou-guo-tesla-cell-electrolyte-2026-07-03.html	letter	2026-07-07
+028	output/cv-zezhou-guo-whoop-senior-battery-engineer-2026-07-07.pdf	output/cv-zezhou-guo-whoop-senior-battery-engineer.html	letter	2026-07-07
+	output/whoop-senior-battery-engineer-cover.pdf		a4	2026-07-07
+027	output/cv-zezhou-guo-south8-battery-scientist-2026-07-07.pdf	output/cv-zezhou-guo-south8-battery-scientist.html	letter	2026-07-07
+040	output/cv-zezhou-guo-amazon-quantum-matchar-2026-07-07.pdf	output/cv-zezhou-guo-amazon-quantum-matchar.html	letter	2026-07-07
+	output/south8-battery-scientist-cover.pdf		a4	2026-07-07
+	output/amazon-quantum-matchar-cover.pdf		a4	2026-07-07
+063	output/cv-zezhou-guo-enervenue-electrode-materials-2026-07-07.pdf	output/cv-zezhou-guo-enervenue-electrode-materials.html	letter	2026-07-07
+	output/enervenue-electrode-materials-cover.pdf	output/enervenue-electrode-materials-cover.html	letter	2026-07-07
