@@ -64,7 +64,7 @@ The user has **explicitly accepted a career pivot from battery R&D into semicond
 
 - **Undergrad transcript (metallurgy/materials coursework) — pointer + framing rule.** A verified HUST B.Eng. transcript (Materials Science & Engineering, 2016–2020) is at `~/Downloads/Degree/11199020_en.pdf`. When a `[pivot-target]` role asks for fundamentals the CV does not surface (metallurgy, composites/MMC, powder/additive feedstock, mechanical/physical-properties testing), you MAY cite the relevant courses — but **only as undergraduate coursework, never as professional experience** (that conflation is forbidden). Read the transcript to pull exact course names; place them in a "Relevant coursework" line under the HUST degree and state plainly in any cover that they are coursework, not industry. **Laser / metal-additive (LPBF/DED) is NOT on the transcript** — do not claim it; nearest backing is "Powder Materials Forming" (soften as a ramp base). The course list itself is content: if it should become permanent CV material, it belongs in `cv.md`/`article-digest.md`, not here.
 
-- **Tesla postings — verify liveness with Playwright, not `check-liveness.mjs`.** Tesla careers pages sit behind an Akamai WAF that blocks the API/curl rung, so `check-liveness.mjs` returns false "expired" signals. Always Playwright-verify Tesla postings (title + JD + Apply = active; footer/nav-only or redirect to generic search = closed). NOTE: Playwright/browser tooling may be unavailable in Codex headless (`codex exec`) — in that case mark the report `**Verification:** unconfirmed` and have the user verify manually rather than trusting a false expired.
+- **Tesla postings — verify liveness with Playwright, not `check-liveness.mjs`.** Tesla careers pages sit behind an Akamai WAF that blocks the API/curl rung, so `check-liveness.mjs` returns false "expired" signals. Always verify Tesla postings with a real browser (title + JD + Apply = active; footer/nav-only or redirect to generic search = closed). NOTE on tooling: Playwright is a project npm dependency (not a Claude-only MCP), so the library is available under any CLI including Codex. The real constraint is that beating Tesla's Akamai wall needs a **headed** browser, which requires a graphical display — fine in interactive `codex`/Claude on the Mac, but not in a truly headless `codex exec` (no display to open a window). When no headed browser can run, mark the report `**Verification:** unconfirmed` and have the user verify manually rather than trusting a false expired.
 
 ## Custom Workflows
 
@@ -74,7 +74,20 @@ The user has **explicitly accepted a career pivot from battery R&D into semicond
      - "prep <company>": pull the JD, generate STAR stories from
        article-digest.md, and draft 5 likely interview questions. -->
 
-(none yet -- add yours above)
+### "package <company | report#>" — full application package
+
+When I say **"package <company/report#>"** (or "生成 package"), run this end-to-end. It composes the `pdf`, `cover`, and `apply`/`email` modes under the Application-Package Generation Workflow below (all of that workflow's rules still apply — this is a named shortcut, not an exception to them).
+
+1. **Restate the request and confirm scope** before generating (which role, any relocation/framing questions). Read the matching `reports/{NNN}-*.md`, plus `cv.md`, `config/profile.yml`, `modes/_profile.md`, and `article-digest.md` if present.
+2. **Re-verify liveness** with the cheapest reliable rung (`check-liveness.mjs` for ATS; Playwright/manual for Tesla and non-ATS — see the Tesla rule above). Abort and tell me if the posting is dead.
+3. **Generate the tailored CV** via the `pdf` path: a role-tailored HTML → PDF, keeping the **complete publication list** (never truncated) and covering every JD-named skill I can back, per Output Preferences.
+4. **Generate the cover letter** (HTML → PDF), running the `humanizer` skill on all narrative prose.
+5. **Generate the apply-packet** (`output/apply-packet-{slug}-{date}.md`): honest answers to the **real** form fields (fetch them from the ATS API when possible — e.g. Greenhouse `?questions=true`, Ashby posting API), a form-logistics block (work auth / sponsorship using the H-1B-transfer framing in `profile.yml`, location, on-site confirm), any knockout/screening questions flagged with the honest answer, plus a draft application email (never invent a recipient address).
+6. **Output the mandatory JD-requirement comparison table** (evidence → placement, with gap rows) in the exact format defined in the Application-Package Generation Workflow.
+7. **Flag every gap** (missing/partial/adjacent) and ask me **claim / soften / drop** for each; wait for my decision before finalizing.
+8. **Do NOT touch tracker status yet** — leave the row `Evaluated`. Record a note that the package is built and awaiting my review. **Never submit, send, or click Apply** — I review and submit myself; only after I confirm submission do you set the row to `Applied` (via `set-status.mjs`) and seed a follow-up (`followup-seed.mjs`).
+
+Deliverables land in `output/`: `cv-zezhou-guo-{slug}-{date}.pdf`, `{slug}-cover.pdf`, `apply-packet-{slug}-{date}.md`.
 
 ## Output Preferences
 
