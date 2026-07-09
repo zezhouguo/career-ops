@@ -6,7 +6,7 @@
 **Archetype:** Failure Analysis / Reliability Engineer + Battery Materials Engineer
 **Score:** 3.9/5
 **Legitimacy:** High Confidence
-**PDF:** not generated - run `/career-ops pdf ulri-research-scientist-iii-electrochemical-safety` to create on demand
+**PDF:** ✅ `output/cv-zezhou-guo-ulri-research-scientist-iii-electrochemical-safety-2026-07-09.pdf`
 
 ---
 
@@ -144,7 +144,7 @@ advertised_comp: "$89,602.01-$123,202.76"
 
 ## Cover Letter Draft
 
-> Draft generated at evaluation time. Complete via `/career-ops cover ulri-research-scientist-iii-electrochemical-safety` to fill in angles, confirm research, and generate the PDF.
+> PDF generated: `output/ulri-research-scientist-iii-electrochemical-safety-cover.pdf` on 2026-07-09. Full apply packet: `output/apply-packet-ulri-research-scientist-iii-electrochemical-safety-2026-07-09.md`.
 
 ---
 

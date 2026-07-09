@@ -74,6 +74,21 @@ The user has **explicitly accepted a career pivot from battery R&D into semicond
      - "prep <company>": pull the JD, generate STAR stories from
        article-digest.md, and draft 5 likely interview questions. -->
 
+### Safari / ADP live-form handling
+
+When I ask you to control Safari for an ADP Recruiting application form:
+
+1. Use Safari AppleScript/JavaScript (`osascript`) when browser plugin control is not available. Read the front tab title/URL first, then inspect the DOM with `do JavaScript`.
+2. For ADP repeat sections such as Employment History, do **not** only write to hidden/pre-rendered fields. First use the page's own `Add Employer` / repeat-section control until the target `Employer N` tab is visible. Then fill the now-active fields.
+3. Verify repeat sections by checking both:
+   - visible repeat tabs, e.g. `Employer 1`, `Employer 2`, `Employer 3`, `Employer 4` are visible; and
+   - actual widget/input values for the active records.
+4. ADP/Dojo pages often store dropdowns in both widget state and hidden inputs. Use the Dojo registry when available (`dijit.registry.toArray()` or `_hash`) to identify option codes, then set both widget values and backing input values. Known codes from the Stellantis ADP form:
+   - Employment type: `Current = 00001000`, `Previous = 00002000`, `No Previous Work Experience = 00003000`
+   - Country/state examples: `USA`, `TX`, `CHN`, `CHN-32` for Jiangsu, `CHN-42` for Hubei
+5. ADP date widgets can desync from hidden date inputs. After setting dates, verify both displayed value (`displayedValue`, e.g. `10/31/2025`) and raw hidden value (`YYYY-MM-DD`). If needed, set the widget by id plus the hidden input and select option.
+6. Never click final Submit/Send/Apply. Filling fields is allowed when I ask for live assistance; final submission remains my action unless I explicitly confirm after review.
+
 ### "package <company | report#>" — full application package
 
 When I say **"package <company/report#>"** (or "生成 package"), run this end-to-end. It composes the `pdf`, `cover`, and `apply`/`email` modes under the Application-Package Generation Workflow below (all of that workflow's rules still apply — this is a named shortcut, not an exception to them).

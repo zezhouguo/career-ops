@@ -181,3 +181,60 @@ Cell design; disruptive cell technologies; electrochemistry; TRL assessment; cel
 ## Keywords extracted
 
 cell design, disruptive cell technologies, electrochemistry, automotive applications, prototype testing, lithium-ion battery materials, electrodes, TRL assessment, LCA, cost assessment, technology roadmap, supplier technical reviews, cell internal design tools, advanced engineering, PhD Materials Engineering, partner relationships, scientific papers, patents, battery cell performance, safety
+
+## Application Answers
+
+**Date:** 2026-07-09
+**State:** submitted
+
+### Free-text answers
+
+1. **Employer 1 job duties**
+
+> Lead advanced lithium-ion cathode materials R&D across NMC, LFP/LMFP, and LMR chemistries; develop Li-rich Mn-rich cathodes via sol-gel synthesis; manage electrochemical validation and multi-scale characterization workflows; build SQL-based data systems with AI/LLM analytics and Bayesian DOE to accelerate screening; prepare kilogram-scale advanced battery-material samples for customer evaluation with technical data support; manage glovebox lab operations, procurement, and equipment/material qualification.
+
+2. **Employer 1 reason for leaving or looking to leave**
+
+> Seeking a role focused on next-generation cell design, prototype validation, and automotive battery technology roadmaps where my cathode, electrolyte, pouch-cell, and data-driven DOE background can be applied at larger product scale.
+
+3. **Employer 2 job duties**
+
+> Conducted Ph.D. research in lithium-ion battery materials and full-cell design; scaled high-Ni NMC cathode synthesis at 10 L pilot scale; developed DRX cathodes in a Tesla-collaborative project; designed and validated coin and pouch cells including 1 Ah multilayer pouch cells; diagnosed degradation mechanisms with in-situ XRD, GITT, EIS, XPS, ToF-SIMS, FIB-SEM, OEMS, and DSC; developed formation protocols and electrolyte strategies for high-energy cells; coordinated technical research within a $75M DOE Battery500 program.
+
+4. **Employer 2 reason for leaving**
+
+> Completed Ph.D. research program and transitioned to an industry battery materials engineering role.
+
+5. **Employer 3 job duties**
+
+> Strengthened Li-ion battery reliability validation by deploying an FBG-based temperature and stress monitoring system for abuse testing, calendar-life aging, and production-level performance verification; improved manufacturing QC and safety validation through SOP documentation and cross-functional workflows; led PFMEA/FMEA activities to identify high-risk failure modes and mitigation strategies for BMS.
+
+6. **Employer 3 reason for leaving**
+
+> Left to begin Ph.D. program in Materials Science and Engineering at UT Austin.
+
+7. **Employer 4 job duties**
+
+> Developed coin and pouch cell assembly SOPs and trained 8+ engineers in DOE, SPC, electrode fabrication, slurry formulation, calendering, and electrochemical testing; engineered nanofiber-structured sulfur cathodes for rate and low-temperature performance; increased sulfur utilization and cycle stability by 30% through fullerene-based supramolecular complexes that suppressed polysulfide shuttle via SEI engineering.
+
+8. **Employer 4 reason for leaving**
+
+> Completed undergraduate research and transitioned to Battery Cell Engineer role at HUST-Wuxi Research Institute.
+
+### Selections made
+
+1. **Portal:** Stellantis / ADP Recruiting
+2. **Submission confirmation:** User confirmed the application was submitted after Safari form completion.
+
+### Other field values
+
+1. **Employer 1:** Versa Materials Technology; Austin, TX, United States; Current; 02/01/2026-present; Sr. Materials Engineer; may contact: Yes.
+2. **Employer 2:** The University of Texas at Austin; Austin, TX, United States; Previous; 06/01/2021-10/31/2025; Graduate Research Assistant; may contact: Yes.
+3. **Employer 3:** HUST-Wuxi Research Institute; Wuxi, Jiangsu, China; Previous; 07/01/2020-05/31/2021; Battery Cell Engineer; may contact: Yes.
+4. **Employer 4:** Huazhong University of Science and Technology; Wuhan, Hubei, China; Previous; 03/01/2017-06/30/2020; Research Assistant; may contact: Yes.
+
+### Files used
+
+1. **CV:** `output/cv-zezhou-guo-stellantis-cell-design-innovation-engineer-2026-07-09.pdf`
+2. **Cover letter:** `output/stellantis-cell-design-innovation-engineer-cover.pdf`
+3. **Apply packet:** `output/apply-packet-stellantis-cell-design-innovation-engineer-2026-07-09.md`

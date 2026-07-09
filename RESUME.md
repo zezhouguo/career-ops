@@ -1,4 +1,34 @@
-# Resume Point — career-ops session (updated 2026-07-03)
+# Resume Point — career-ops session (updated 2026-07-09)
+
+## 🆕 CHECKPOINT 2026-07-09 (latest) — UL Research Institutes #088 APPLIED ✅ (co-filled Workday)
+- **UL Research Institutes — Research Scientist III, Electrochemical Safety Research Institute (#088, 3.9/5) submitted 2026-07-09** via Workday: `https://ulse.wd5.myworkdayjobs.com/ulricareers/job/Houston-TX/Research-Scientist-III---Electrochemical-Safety-Research-Institute_JR1517-1?source=LinkedIn`.
+- **Below the standard 4.0 apply line** (core battery-safety R&D, not a `[pivot-target]`); user explicitly confirmed proceeding anyway despite comp below target ($89.6K-123.2K vs. $130K-160K target) and unconfirmed sponsorship — see the report's "Why this scores below the standard line" box in the apply packet.
+- Tracker updated through canonical path: row #88 is now `Applied`, notes appended noting the Workday submission.
+- Follow-up seeded: `data/follow-ups.md` has `- next #88 2026-07-16 (set 2026-07-09)`.
+- Package files built in `output/`:
+  - CV: `output/cv-zezhou-guo-ulri-research-scientist-iii-electrochemical-safety-2026-07-09.pdf` (led with battery-safety/failure-analysis framing per report guidance — LHCE thermal/gas-safety bullet and crossover-FA bullet moved to top of UT Austin section)
+  - Cover PDF: `output/ulri-research-scientist-iii-electrochemical-safety-cover.pdf`
+  - Cover draft: `output/ulri-research-scientist-iii-electrochemical-safety-cover-2026-07-09.md`
+  - Apply packet: `output/apply-packet-ulri-research-scientist-iii-electrochemical-safety-2026-07-09.md`
+- Liveness confirmed active via `check-liveness.mjs` before package build.
+- **Workday "Field of Study" combobox gotcha (ULSE/ULRI Workday instance):** the Field of Study field on the Education section is a `react-virtualized` list combobox — synthetic `.click()`/`MouseEvent`/`PointerEvent` dispatch on the option node does NOT reliably commit the selection (no Accessibility permission available to osascript for real OS-level clicks/keystrokes either). Selecting it for Education 1 worked once via scroll-then-click, but repeated attempts for Education 2 silently failed and the form auto-advanced through steps 3-5 (My Experience → Application Questions → Voluntary Disclosures) without a chance to review the Application Questions answers before the user caught it and took over manually. **If this recurs: don't burn turns retrying synthetic events — flag it to the user immediately and let them click it themselves**, and always re-verify which step the form is actually on after several rapid interactions (`progressBarCompletedStep` elements) rather than assuming step order held.
+- Gap handling preserved: ARC/GC-MS/rheology/moisture/DPA and supercapacitors named directly as gaps (not fabricated), framed as DSC/TGA/OEMS-adjacent and Li-ion/Li-metal/Li-S-transferable respectively.
+- Note for future follow-up: confirm salary flexibility (posted range under target) and H-1B transfer sponsorship (unstated in JD) early in the recruiter screen.
+
+## 🆕 CHECKPOINT 2026-07-09 — Nth Cycle #079 APPLIED ✅
+- **Nth Cycle — Senior Electrochemical Engineer (#079, 4.2/5) submitted 2026-07-09** via Betterteam: `https://nthcycle.betterteam.com/senior-electrochemical-engineer`.
+- Tracker updated through canonical path: row #79 is now `Applied`, PDF `✅`, notes appended: `Applied via Betterteam on 2026-07-09.`
+- Follow-up seeded: `data/follow-ups.md` has `- next #79 2026-07-16 (set 2026-07-09)`.
+- Package files built in `output/`:
+  - CV: `output/cv-zezhou-guo-nth-cycle-senior-electrochemical-engineer-2026-07-09.pdf`
+  - Cover PDF: `output/nth-cycle-senior-electrochemical-engineer-cover.pdf`
+  - Cover draft: `output/nth-cycle-senior-electrochemical-engineer-cover-2026-07-09.md`
+  - Cover payload: `output/nth-cycle-senior-electrochemical-engineer-cover-payload-2026-07-09.json`
+  - Apply packet: `output/apply-packet-nth-cycle-senior-electrochemical-engineer-2026-07-09.md`
+- Liveness was checked before package build: `node check-liveness.mjs https://nthcycle.betterteam.com/senior-electrochemical-engineer` returned active.
+- Gap handling preserved: materials say battery electrochemistry is direct, copper electroextraction/electrowinning is adjacent; no PLC ownership claimed.
+- Note for future follow-up: confirm H-1B transfer sponsorship early; JD salary range was `$120,000-$180,000`, target should not anchor low.
+- Worktree context at checkpoint: `data/applications.md`, `data/follow-ups.md`, `data/pdf-index.tsv` modified; there are also pre-existing/session-local changes outside #079 (`modes/_custom.md`, `reports/084-...`, `.codex/`, `data/scan-runs.tsv`). Do not revert unrelated changes.
 
 ## 🆕 CHECKPOINT 2026-07-03 (latest) — INTEL #19 APPLIED ✅ (co-filled Workday)
 - **Intel Defect Metrology (JR0285193, 3.8) SUBMITTED 2026-07-03** via Workday "Autofill with Resume". Co-filled experience/education/legal questionnaire in-session; user signed in, uploaded résumé, clicked Submit. Tracker #19 Evaluated→Applied; Application Log appended to reports/019. verify-pipeline clean.
