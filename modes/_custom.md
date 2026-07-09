@@ -55,6 +55,17 @@ The user has **explicitly accepted a career pivot from battery R&D into semicond
 
 5. **Always surface the fit caveats too.** Passing the line ≠ hiding the gaps. Keep naming the domain gaps (EUV-litho, hands-on TEM, 300mm-fab min-quals, level reset, relocation, comp-floor risk) so the user still applies with eyes open. Down-level and comp-floor risk are flags, not auto-blocks.
 
+## Reference & Operational Rules (cross-CLI — mirrored from Claude auto-memory)
+
+<!-- These lived only in Claude Code's auto-memory, which other CLIs (Codex, etc.)
+     cannot read. Mirrored here so any CLI that loads _custom.md honors them.
+     These are procedural/reference rules and liveness handling — NOT content
+     sources for CV/cover claims. -->
+
+- **Undergrad transcript (metallurgy/materials coursework) — pointer + framing rule.** A verified HUST B.Eng. transcript (Materials Science & Engineering, 2016–2020) is at `~/Downloads/Degree/11199020_en.pdf`. When a `[pivot-target]` role asks for fundamentals the CV does not surface (metallurgy, composites/MMC, powder/additive feedstock, mechanical/physical-properties testing), you MAY cite the relevant courses — but **only as undergraduate coursework, never as professional experience** (that conflation is forbidden). Read the transcript to pull exact course names; place them in a "Relevant coursework" line under the HUST degree and state plainly in any cover that they are coursework, not industry. **Laser / metal-additive (LPBF/DED) is NOT on the transcript** — do not claim it; nearest backing is "Powder Materials Forming" (soften as a ramp base). The course list itself is content: if it should become permanent CV material, it belongs in `cv.md`/`article-digest.md`, not here.
+
+- **Tesla postings — verify liveness with Playwright, not `check-liveness.mjs`.** Tesla careers pages sit behind an Akamai WAF that blocks the API/curl rung, so `check-liveness.mjs` returns false "expired" signals. Always Playwright-verify Tesla postings (title + JD + Apply = active; footer/nav-only or redirect to generic search = closed). NOTE: Playwright/browser tooling may be unavailable in Codex headless (`codex exec`) — in that case mark the report `**Verification:** unconfirmed` and have the user verify manually rather than trusting a false expired.
+
 ## Custom Workflows
 
 <!-- Multi-step routines you run often, given a short name. Examples:
