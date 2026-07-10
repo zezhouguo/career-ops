@@ -1,4 +1,11 @@
-# Resume Point — career-ops session (updated 2026-07-09)
+# Resume Point — career-ops session (updated 2026-07-10)
+
+## 🆕 CHECKPOINT 2026-07-10 (latest) — Meta #086 APPLIED ✅ (Meta Careers)
+- **Meta — Research Engineer - Automated Lab Development (#086, 3.7/5) submitted 2026-07-10** via Meta Careers.
+- Tracker updated through the canonical path (`set-status.mjs`): row #86 is now `Applied`; note appended: `Applied via Meta Careers on 2026-07-10.`
+- Reused the approved 2026-07-09 package: `output/cv-zezhou-guo-meta-automated-lab-development-2026-07-09.pdf`; no replacement résumé was generated for the submission.
+- Application-answer snapshot updated to `submitted` in `output/086-meta-application-answers-filled-2026-07-10.json` and synchronized to `reports/086-meta-automated-lab-development-2026-07-09.md`. The three AI-related prescreen answers now reflect the user's supplied examples: XRD/cycler/Airtable automation plus Bayesian experiment planning; catching pH-driven formulation precipitation; and learning through official OpenAI/Anthropic channels, YouTube, and GitHub projects.
+- Follow-up seeded: `data/follow-ups.md` has `- next #86 2026-07-17 (set 2026-07-10)`.
 
 ## 🆕 CHECKPOINT 2026-07-09 (latest) — Sila Nanotechnologies #075 + #076 both APPLIED ✅ (LinkedIn Easy Apply / Greenhouse)
 - **Sila Nanotechnologies — Senior Battery Engineer (#075, 4.3/5) submitted 2026-07-09** via LinkedIn Easy Apply: `https://www.linkedin.com/jobs/view/4436823400/`.

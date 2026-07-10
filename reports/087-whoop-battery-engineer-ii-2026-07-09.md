@@ -6,7 +6,7 @@
 **Archetype:** Cell Design / Battery Engineer + Failure Analysis / Reliability Engineer
 **Score:** 3.5/5
 **Legitimacy:** High Confidence
-**PDF:** not generated - run `/career-ops pdf whoop-battery-engineer-ii` to create on demand
+**PDF:** ✅ generated 2026-07-10 — `output/cv-zezhou-guo-whoop-battery-engineer-ii-2026-07-10.pdf` + `output/whoop-battery-engineer-ii-cover.pdf`
 
 ---
 
@@ -176,6 +176,8 @@ Battery test plans; design validation; qualification; performance; durability; s
 ---
 
 *Run `/career-ops cover whoop-battery-engineer-ii` to complete angles, confirm company research, and generate the PDF.*
+
+**PDF generated: output/whoop-battery-engineer-ii-cover.pdf on 2026-07-10.** Addressed to "WHOOP Battery Engineering Team" (no individual named in the JD). Formal tone, problems section ties to the WHOOP 5.0/MG battery-capacity and medical-grade regulatory scale-up. Per user decision, the level/comp concern is NOT raised proactively in the materials — to be discussed with the recruiter after applying. UL/CE/IEC and GD&T gaps softened per the report's original mitigation language.
 
 ## Keywords extracted
 
