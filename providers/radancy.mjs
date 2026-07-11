@@ -86,7 +86,13 @@ export function parseResults(html, origin) {
     } catch {
       continue;
     }
-    const locM = block.match(/__job-info--location[\s\S]*?<span>([\s\S]*?)<\/span>/);
+    // TalentBrew has two live location layouts. Older/branded boards wrap the
+    // value in a `__job-info--location ... <span>` element, while newer boards
+    // such as Applied Materials render it directly in
+    // `<li class="... job-location">Santa Clara, CA</li>`. Support both so an
+    // empty location cannot silently bypass the scanner's US-only filter.
+    const locM = block.match(/__job-info--location[\s\S]*?<span>([\s\S]*?)<\/span>/)
+      || block.match(/class="[^"]*\bjob-location\b[^"]*"[^>]*>([\s\S]*?)<\/li>/);
     seen.add(id);
     out.push({ id, title, url, location: locM ? clean(locM[1]) : '' });
   }

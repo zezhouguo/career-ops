@@ -38,6 +38,12 @@ try {
   else fail(`radancy.parseResults() title wrong: ${JSON.stringify(rows[0]?.title)}`);
   if (rows[0]?.url === 'https://careers.munichre.com/en/job/city/40548453568-slug/3193/40548453568' && rows[0]?.location === 'Bingen am Rhein, Germany') pass('radancy.parseResults() builds absolute URLs and extracts the location span');
   else fail(`radancy.parseResults() url/loc wrong: ${JSON.stringify(rows[0])}`);
+  const appliedHtml = '<li class="search-results-list__item">' +
+    '<h2 class="search-results-list__job-title"><a class="search-results-list__job-link" href="/job/santa-clara/materials-scientist/95/123" data-job-id="123">Materials Scientist</a></h2>' +
+    '<ul class="search-results-list__job-info-list"><li class="search-results-list__job-info job-location"> Santa Clara, CA </li></ul></li>';
+  const appliedRows = parseResults(appliedHtml, 'https://jobs.appliedmaterials.com');
+  if (appliedRows.length === 1 && appliedRows[0].location === 'Santa Clara, CA') pass('radancy.parseResults() extracts the direct job-location layout');
+  else fail(`radancy.parseResults() direct job-location layout wrong: ${JSON.stringify(appliedRows)}`);
   if (parseResults('<html>no items</html>', 'https://x').length === 0 && parseResults(undefined, 'https://x').length === 0) pass('radancy.parseResults() returns [] for item-less / non-string input');
   else fail('radancy.parseResults() should return [] without items');
 

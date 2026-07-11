@@ -47,6 +47,29 @@ function validateExplicitApi(apiUrl) {
   return u.protocol === 'https:' ? u.href : null;
 }
 
+function resolveCanonicalJobUrl(raw, origin) {
+  if (typeof raw !== 'string' || !raw.trim() || !origin) return null;
+  try {
+    // canonical_url is defined as an absolute URL by Jibe. Do not resolve an
+    // arbitrary relative string against the careers origin: malformed feed
+    // data such as "not a URL" would otherwise become a misleading local path.
+    const url = new URL(raw.trim());
+    if (
+      url.protocol !== 'https:'
+      || url.origin !== origin
+      || url.username
+      || url.password
+    ) return null;
+    // Fragments are client-side navigation only and create needless duplicate
+    // scanner URLs for the same posting. Preserve useful query parameters such
+    // as Jibe's `?lang=en-us`.
+    url.hash = '';
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
 export function parseJibeapplyResponse(json, entry) {
   let origin = '';
   try { origin = new URL(entry.careers_url || '').origin; } catch { /* ignore */ }
@@ -65,9 +88,16 @@ export function parseJibeapplyResponse(json, entry) {
       const title = String(d.title || '').trim();
       const slug = d.slug || d.req_id;
       if (!title || !slug) return null;
+      // Branded Jibe/iCIMS tenants expose the authoritative public URL in
+      // meta_data.canonical_url. Prefer it when it is HTTPS and stays on the
+      // configured careers origin; otherwise retain the deterministic slug
+      // fallback. The origin check prevents an upstream payload from turning
+      // scanner output into an off-site link.
+      const canonical = d?.meta_data?.canonical_url ?? item?.meta_data?.canonical_url;
+      const jobUrl = resolveCanonicalJobUrl(canonical, origin);
       return {
         title,
-        url: `${origin}/jobs/${encodeURIComponent(slug)}`,
+        url: jobUrl || `${origin}/jobs/${encodeURIComponent(slug)}`,
         company: String(d.hiring_organization || entry.name || '').trim(),
         location: d.full_location || [d.city, d.country].filter(Boolean).join(', '),
       };
@@ -105,7 +135,13 @@ export default {
 
     if (total > pageSize && pageSize > 0) {
       const maxPages = resolveMaxPages(entry);
-      const pages = Math.min(Math.ceil(total / pageSize), maxPages);
+      // Liveness probes only need the first page and set ctx.maxPages=1.
+      // Honor that independent context cap without treating it as entry-level
+      // truncation; normal scans do not set it.
+      const ctxCap = Number.isInteger(ctx?.maxPages) && ctx.maxPages > 0
+        ? ctx.maxPages
+        : Infinity;
+      const pages = Math.min(Math.ceil(total / pageSize), maxPages, ctxCap);
       // Sequential, not concurrent (mirrors providers/4dayweek.mjs, thehub.mjs,
       // arbeitnow.mjs, workday.mjs) — a single tenant's API has no reason to
       // receive a burst of parallel requests, and a mid-run failure stops

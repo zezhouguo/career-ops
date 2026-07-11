@@ -103,6 +103,37 @@ try {
     fail(`row 2 title = ${JSON.stringify(parsedJibe[2].title)}`);
   }
 
+  // Branded Jibe/iCIMS feeds publish the authoritative URL in metadata.
+  const withCanonical = parseJibeapplyResponse({ jobs: [{
+    title: 'Materials Scientist',
+    slug: 'materials-scientist',
+    meta_data: { canonical_url: 'https://acme.jibeapply.com/jobs/4242?lang=en-us' },
+  }] }, entry);
+  if (withCanonical[0]?.url === 'https://acme.jibeapply.com/jobs/4242?lang=en-us') {
+    pass('parseJibeapplyResponse prefers a same-origin HTTPS canonical URL');
+  } else {
+    fail(`same-origin canonical url = ${JSON.stringify(withCanonical[0]?.url)}`);
+  }
+
+  const unsafeCanonicals = [
+    'https://evil.example/phishing',
+    'http://acme.jibeapply.com/jobs/insecure',
+    'https://user:password@acme.jibeapply.com/jobs/credentialed',
+    'not a URL',
+  ];
+  const rejectedCanonicalUrls = unsafeCanonicals.map((canonical_url, i) =>
+    parseJibeapplyResponse({ jobs: [{
+      title: `Safe Job ${i}`,
+      slug: `safe-job-${i}`,
+      meta_data: { canonical_url },
+    }] }, entry)[0]?.url
+  );
+  if (rejectedCanonicalUrls.every((url, i) => url === `https://acme.jibeapply.com/jobs/safe-job-${i}`)) {
+    pass('parseJibeapplyResponse rejects cross-origin, non-HTTPS, credentialed, and malformed canonical URLs');
+  } else {
+    fail(`unsafe canonical fallbacks = ${JSON.stringify(rejectedCanonicalUrls)}`);
+  }
+
   // parseJibeapplyResponse — falls back to entry.name when hiring_organization missing
   const noOrg = parseJibeapplyResponse({ jobs: [{ title: 'Dev', slug: 'dev', city: 'Berlin', country: 'Germany' }] }, entry);
   if (noOrg[0].company === 'Acme') {
@@ -157,6 +188,36 @@ try {
     pass('jibeapply.fetch() paginates across 2 pages (10+5=15)');
   } else {
     fail(`jibeapply fetch pagination: requests=${pageRequests}, total=${fetchedJibe.length} (expected 2/15)`);
+  }
+
+  // verify-portals sets a context cap for a cheap, quiet liveness probe.
+  let probeRequests = 0;
+  const probeWarnings = [];
+  const probeConsoleError = console.error;
+  console.error = (msg) => probeWarnings.push(msg);
+  let fetchedProbe;
+  try {
+    fetchedProbe = await jibeapply.fetch(entry, {
+      maxPages: 1,
+      transport: 'http',
+      fetchText: async () => { throw new Error('fetchText not expected'); },
+      fetchJson: async () => {
+        probeRequests++;
+        return { totalCount: 30, count: 10, jobs: Array.from({ length: 10 }, (_, i) => ({ title: `Probe ${i}`, slug: `probe-${i}` })) };
+      },
+    });
+  } finally {
+    console.error = probeConsoleError;
+  }
+  if (probeRequests === 1 && fetchedProbe.length === 10) {
+    pass('jibeapply.fetch() honors ctx.maxPages=1 for a one-page liveness probe');
+  } else {
+    fail(`jibeapply liveness cap: requests=${probeRequests}, total=${fetchedProbe.length} (expected 1/10)`);
+  }
+  if (probeWarnings.length === 0) {
+    pass('jibeapply.fetch() stays silent under the liveness probe cap');
+  } else {
+    fail(`jibeapply liveness cap warnings = ${JSON.stringify(probeWarnings)}`);
   }
 
   // fetch() pagination cap — an inflated totalCount must not trigger unbounded
@@ -308,4 +369,3 @@ try {
 } catch (e) {
   fail(`jibeapply provider tests crashed: ${e.message}`);
 }
-
