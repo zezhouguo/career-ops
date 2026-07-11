@@ -30,6 +30,8 @@
      - Cap each batch run at 20 listings unless I say otherwise.
      - If a report scores below 6, skip the cover letter. -->
 
+- **Always include a salutation line in cover letters, even with no named contact.** Use a generic greeting ("Dear Hiring Manager," or similar) rather than omitting it — do not rely on the "omit if no name" default in `modes/cover.md`.
+
 - **Language: converse in Chinese, produce documents in English.** All chat replies, explanations, and questions to me should be in Chinese (中文). But every created work-product stays in English regardless of chat language: CVs, cover letters, application-form answers, recruiter/outreach emails, reports, the tracker (`data/applications.md`), and any file content. (Rationale: US-based, English-language job search — documents must be in English to be usable.)
 
 ## Career-Pivot Intent — Apply-Line Override (set 2026-07-08)
@@ -104,6 +106,18 @@ When I say **"package <company/report#>"** (or "生成 package"), run this end-t
 
 Deliverables land in `output/`: `cv-zezhou-guo-{slug}-{date}.pdf`, `{slug}-cover.pdf`, `apply-packet-{slug}-{date}.md`.
 
+### Batch package handling — additional rules (set 2026-07-10)
+
+<!-- Learned while processing a 7+1-report batch (#102/#107/#074/#098/#087/#077/#003, then #117)
+     in one session. Applies whenever I name a list of report numbers to package. -->
+
+- **A named batch of report numbers is itself my override of the score gate.** When I list specific report numbers to package (e.g. "prepare packages for #102, #107, ..."), that selection already reflects my decision to proceed despite sub-4.0 scores. Name the score and known gaps once per report for context, then proceed — don't re-ask "are you sure" on every low-scoring report in the same batch.
+- **Structural gaps get a dedicated confirmation question; soft/wording gaps don't.** Soft gaps (a missing skill/keyword with an obvious mitigation) just need a surfaced default, not a question. Structural gaps — down-level/comp mismatch, program-eligibility questions (e.g. "New College Grad" vs. already employed), a fundamental functional pivot (lab R&D → customer-facing role), or a "Proceed with Caution" legitimacy flag — need an explicit AskUserQuestion before drafting, since CV wording alone can't resolve them. Once I answer a structural question one way (e.g. "don't raise level/comp proactively, discuss after applying"), apply that same default to later reports in the same batch that hit an analogous structural gap, without re-asking, unless the situation differs materially.
+- **Re-verify liveness AND re-read the live JD for material drift, not just an active/expired signal.** If the posting is closed, stop, report it, and ask how to proceed (skip / try a named contact instead / check for a re-posted duplicate) rather than building materials for a dead listing. If the live JD's requirements have measurably tightened or changed since the report was written (a "preferred" skill became "required," new tools/tech named that I don't have), flag the drift explicitly and get a decision before investing in a tailored package rather than building on stale assumptions.
+- **`humanizer` applies to every human-facing artifact, not just the cover letter and email** — including a LinkedIn comment or DM drafted for a recruiting post.
+- **When a named individual personally solicits applications** (e.g. a LinkedIn "DM me with your resume" recruiting post), address the cover letter to them by name, and offer a short humanized public comment for their post as a companion outreach artifact alongside the usual package.
+- **My own direct statement about my real experience, made in the conversation, is valid source-of-truth** for a claim (per the Source-of-Truth Boundary in `AGENTS.md`/`CLAUDE.md`) — but phrase the resulting claim narrowly, matching exactly what I said, not a broader skill than I actually described.
+
 ## Output Preferences
 
 <!-- How you like results formatted. Examples:
@@ -112,7 +126,11 @@ Deliverables land in `output/`: `cv-zezhou-guo-{slug}-{date}.pdf`, `{slug}-cover
      - Save PDFs date-first: YYYY-MM-DD-company.pdf -->
 
 - **CVs: always show the COMPLETE publication list.** Never truncate to "Selected Publications" or a top-N subset. Every generated CV (for any role) must include my full publication list from `cv.md`, in the same order. Applies to all packages, not just one role.
-- **Cover letter greeting: avoid generic "Dear Hiring Team" when a more specific address is available.** Before defaulting to a generic greeting, check the JD/report for a named hiring manager, recruiter, or specific team/department (e.g. "electrochemical R&D team," "EVDD Hiring Team"). Prefer, in this order: (1) a named individual if one is actually given and it is appropriate to address them directly (e.g. a hiring manager named in the JD); (2) the specific team/department name if the JD names one; (3) "Dear {Company} Hiring Team," naming the company at minimum. Never invent a person's name — only use one if the JD/report text actually states it. Applies to every cover letter, for every role. (Set 2026-07-10.)
+- **Cover letter greeting: avoid generic "Dear Hiring Team" when a more specific address is available.** Before defaulting to a generic greeting, check the JD/report for a named hiring manager, recruiter, or specific team/department (e.g. "electrochemical R&D team," "EVDD Hiring Team"). Prefer, in this order:
+  1. A named individual, if one is actually given and it is appropriate to address them directly (e.g. a hiring manager named in the JD, or an employee who personally posted the recruiting call).
+  2. The specific team/department name, if the JD names one (e.g. "Dear {Team Name} Team,").
+  3. **Fallback when no name or team is found anywhere in the JD/report:** "Dear {Company} Hiring Team," — naming the company at minimum is always possible and is the floor, never a bare "Dear Hiring Team," with no company name attached.
+  Never invent a person's name or a team name — only use one if the JD/report text actually states it; when in doubt, drop to the next tier rather than guess. Applies to every cover letter, for every role. (Set 2026-07-10.)
 - **Skills: cover every skill the JD names, and flag my gaps explicitly.** When tailoring the Skills section for any role, include every skill/technique/tool the JD mentions that I can legitimately back from `cv.md` / `article-digest.md` / my direct statements. For any JD-named skill I may NOT have (or where my evidence is partial/adjacent — e.g. related material but not the exact one), do NOT silently insert or omit it: surface it to me as an explicit gap ("JD asks X; your evidence is Y — claim it, soften it, or drop it?") and let me decide before finalizing. Applies to all packages.
 
 ## Application-Package Generation Workflow (ALWAYS follow for every package)
