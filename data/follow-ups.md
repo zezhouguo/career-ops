@@ -5,6 +5,8 @@
 | 1 | 63 | 2026-07-09 | EnerVenue | Battery Electrode Materials R&D Scientist | LinkedIn | Anyang Hu | Connect note sent after application |
 | 2 | 63 | 2026-07-09 | EnerVenue | Battery Electrode Materials R&D Scientist | LinkedIn | Anyang Hu | Replied with resume attached; confirmed Fremont/Bay Area relocation works |
 | 3 | 63 | 2026-07-14 | EnerVenue | Battery Electrode Materials R&D Scientist | Email/Rippling | Katie Kutz | Company requested phone-screen availability; submitted slots Wed 7/15 10:30-11:00 + Thu 7/16 9:30-10:00 (America/Chicago); awaiting confirmation |
+| 4 | 63 | 2026-07-14 | EnerVenue | Battery Electrode Materials R&D Scientist | Email | Katie Kutz | CONFIRMED: phone interview Wed 2026-07-15 10:30 AM CT (08:30 PDT) with Jonathan Zu, Principal Scientist; he calls the phone on file |
+| 5 | 63 | 2026-07-14 | EnerVenue | Battery Electrode Materials R&D Scientist | Email | Katie Kutz | Sent reply-all confirming the Wed slot and phone number; sponsorship question deliberately deferred until after the tech screen (user decision) |
 - next #12 2026-07-13 (set 2026-07-06)
 - next #17 2026-07-14 (set 2026-07-07)
 - next #63 2026-07-14 (set 2026-07-08)
