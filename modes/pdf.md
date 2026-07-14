@@ -27,7 +27,7 @@
     b. If rasterized page images were reported (`🖼️ Rasterized N page(s)...`), read each one (the `Read` tool renders images natively) and check for: orphaned section/entry titles stranded alone at a page break, text overlap or cutoff, and inconsistent/fallback fonts. This is the same script-measures/agent-judges split already used by the optional Canva sub-flow's thumbnail-inspection step below, just applied to the default path.
     c. **If the page count exceeds the cap or the visual check finds an overflow-driven defect**, work through this ladder, re-running Step 17's command and re-checking after each change, capped at 3-4 rounds before stopping to ask the user rather than looping indefinitely:
        1. **Density nudge (content-preserving, try first):** in `cv-template.html`, `body { line-height: 1.5; }` may be nudged down to as low as `1.35`, and `.section { margin-bottom: 18px; }` down to as low as `12px`. Change one, re-render, re-check — don't drop both at once. Revert to the template defaults (`1.5` / `18px`) once the CV is regenerated for a different role; these are per-run adjustments, not a permanent template edit.
-       2. **Content trim (once the density floor is reached and it still overflows):** cut the single least-relevant bullet (weakest tie to the JD keywords from Step 3, and not redundant with anything the cover letter already leans on), re-render, re-check. Repeat one bullet at a time — never cut several speculatively. **Never cut anything from Publications/Certifications/Education** — only Experience/Project bullets are fair game.
+       2. **Content trim (mechanized — once the density floor is reached and it still overflows):** run `node cv-trim.mjs output/cv-{candidate}-{company}-payload.json --format=html --paper={letter|a4} --max-pages={N} --out=output/cv-{candidate}-{company}-{YYYY-MM-DD}.pdf --jd-keywords={Step-3 keywords, comma-joined} [--achievements=output/{company}-cover-payload.json]`. It scores every Experience/Project bullet by JD relevance (3× keyword hits + 1× JD-body hits) and uniqueness, protects each entry's last bullet, structurally never touches Publications/Certifications/Education/Skills, and cuts the single lowest-scoring bullet at a time (re-rendering and re-measuring after each) until the cap is met — preferring bullets the approved cover letter does NOT lean on (`--achievements` marks those). Read its JSON report: `cuts[]` lists exactly what was removed and why; `coverDependentCut: true` means the letter may now cite removed evidence — revise it; `trimmedPayload` is the payload to record as this CV's source going forward. Trim-loop renders never write `data/pdf-index.tsv` — after convergence, re-run Step 17's command once on the final HTML so the manifest row and text-verification report are recorded.
        3. **Escape hatch:** if every non-Publications bullet is already cut and it still overflows (a real scenario for a long publication list), stop and tell the user directly — raise `cv.max_pages` in `config/profile.yml`, or accept the current page count. Never silently violate the "complete publication list" rule from `modes/_custom.md` to force a page-count match.
     d. If contact info didn't parse cleanly (`contact.emailFound`/`contact.phoneFound` false) or keyword coverage looks unexpectedly low, that's a rendering issue (e.g. font substitution garbling text) rather than an overflow issue — flag it to the user rather than trying the overflow ladder above, which won't fix it.
 19. Report: PDF path, number of pages (vs. cap), JD-keyword coverage % (script-computed), contact-info-parseable (yes/no), and — if Step 18c ran — which bullet(s) were cut and why.
@@ -61,7 +61,8 @@
   "skills": [ { "category": "Microanalysis", "items": ["XPS", "ToF-SIMS", "FIB-SEM"] } ],
   "publications": [
     { "text": "Guo, Z.; Co-author, A. Paper Title.", "emphasis": "Guo, Z.", "venue": "Adv. Mater.", "detail": "2026, e18490." }
-  ]
+  ],
+  "jd": { "keywords": ["keyword one", "keyword two"], "text": "full JD text (optional)" }
 }
 ```
 
@@ -69,6 +70,7 @@
 - `emphasis` bolds the candidate's own name at its first occurrence; `venue` renders italic. A publication entry may instead be a plain string when you don't need those.
 - `linkedin`/`portfolio`/`github` each take `{ url, display }`; a missing one is skipped (no dangling separator). `photo` is an opt-in field (empty by default — see the profile-photo note).
 - `section_titles` is optional and English by default; set it for localized CVs (e.g. German `"experience": "Berufserfahrung"`).
+- `jd` is optional metadata for `cv-trim.mjs` (Step 18c): `keywords` mirrors Step 3's extracted list so the trim loop scores relevance from the same signal instead of re-deriving one; `text` (optional) supplies 1×-weight body tokens. Both builders ignore this field.
 
 ## ATS Rules (clean parsing)
 

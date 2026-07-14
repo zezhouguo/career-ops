@@ -268,7 +268,7 @@ async function generatePDF() {
 
   // Parse arguments
   let inputPath, outputPath, format = 'a4', reportNum = '', allowReorder = false;
-  let maxPages = null, verifyText = false, jdKeywords = [];
+  let maxPages = null, verifyText = false, jdKeywords = [], updateManifest = true;
 
   for (const arg of args) {
     if (arg.startsWith('--format=')) {
@@ -281,6 +281,8 @@ async function generatePDF() {
       maxPages = parseInt(arg.split('=')[1], 10);
     } else if (arg === '--verify-text') {
       verifyText = true;
+    } else if (arg === '--no-manifest') {
+      updateManifest = false;
     } else if (arg.startsWith('--jd-keywords=')) {
       jdKeywords = arg.slice('--jd-keywords='.length).split(',').map((k) => k.trim()).filter(Boolean);
     } else if (!inputPath) {
@@ -291,7 +293,7 @@ async function generatePDF() {
   }
 
   if (!inputPath || !outputPath) {
-    console.error('Usage: node generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4] [--report=NNN] [--allow-reorder] [--max-pages=N] [--verify-text] [--jd-keywords=k1,k2,...]');
+    console.error('Usage: node generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4] [--report=NNN] [--allow-reorder] [--max-pages=N] [--verify-text] [--jd-keywords=k1,k2,...] [--no-manifest]');
     console.error('');
     console.error('This script only converts an already-built HTML file to PDF.');
     console.error('The input HTML is produced by the pdf mode: the agent fills cv-template.html');
@@ -366,6 +368,7 @@ async function generatePDF() {
     jdKeywords,
     contact,
     cvMarkdown,
+    updateManifest,
   });
 }
 
@@ -434,6 +437,10 @@ export async function renderHtmlToPdf(html, outputPath, opts = {}) {
   const verifyText = opts.verifyText || false;
   const jdKeywords = opts.jdKeywords || [];
   const contact = opts.contact || {};
+  // Iterative callers (cv-trim.mjs) pass updateManifest:false so re-renders
+  // don't append a data/pdf-index.tsv row per iteration; the default (true)
+  // keeps the existing CLI and cover-letter behavior unchanged.
+  const updateManifest = opts.updateManifest !== false;
   // Preserved across the try block for the post-render text-verification
   // pass below, which needs the same cv.md content extractRenderedSectionOrder
   // was already compared against pre-render.
@@ -538,12 +545,14 @@ export async function renderHtmlToPdf(html, outputPath, opts = {}) {
       }
     }
 
-    try {
-      updatePDFManifest(reportNum, outputPath, inputPath, format);
-      console.log(`🔗 Manifest: data/pdf-index.tsv updated${reportNum ? ` (report ${reportNum})` : ' (no --report given)'}`);
-    } catch (err) {
-      // The PDF itself succeeded — never fail the run over manifest bookkeeping.
-      console.error(`⚠️  Manifest update failed: ${err.message}`);
+    if (updateManifest) {
+      try {
+        updatePDFManifest(reportNum, outputPath, inputPath, format);
+        console.log(`🔗 Manifest: data/pdf-index.tsv updated${reportNum ? ` (report ${reportNum})` : ' (no --report given)'}`);
+      } catch (err) {
+        // The PDF itself succeeded — never fail the run over manifest bookkeeping.
+        console.error(`⚠️  Manifest update failed: ${err.message}`);
+      }
     }
 
     return result;

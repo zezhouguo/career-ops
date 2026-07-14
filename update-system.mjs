@@ -239,6 +239,7 @@ const SYSTEM_PATHS = [
   'build-cv-latex.mjs',
   'build-cv-html.mjs',
   'cv-payload-utils.mjs',
+  'cv-trim.mjs',
   'scaffolder/',
   'Dockerfile',
   'docker-compose.yml',

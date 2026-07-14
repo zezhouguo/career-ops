@@ -133,6 +133,7 @@ const scripts = [
   { name: 'cv-payload-utils.mjs --self-test', expectExit: 0 },
   { name: 'build-cv-html.mjs --self-test', expectExit: 0 },
   { name: 'build-cv-latex.mjs --test', expectExit: 0 },
+  { name: 'cv-trim.mjs --self-test', expectExit: 0 },
   { name: 'updater-migration-tests.mjs', expectExit: 0 },
   { name: 'tracker-columns-tests.mjs', expectExit: 0 },
   { name: 'agent-inbox-tests.mjs', expectExit: 0 },

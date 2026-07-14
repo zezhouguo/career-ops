@@ -13,6 +13,9 @@ All scripts live in the project root as `.mjs` modules and are exposed via `npm 
 | `npm run merge` | `merge-tracker.mjs` | Merge batch TSVs into applications.md |
 | `npm run pdf` | `generate-pdf.mjs` | Convert HTML to ATS-optimized PDF |
 | `npm run build:latex` | `build-cv-latex.mjs` | Build .tex from structured JSON payload |
+| — | `build-cv-html.mjs` | Build the ATS-safe CV HTML from the same structured JSON payload (HTML twin of `build-cv-latex.mjs`; Publications never truncated) |
+| — | `cv-payload-utils.mjs` | Format-independent helpers (`sanitizeUrl`, `splitBoldSpans`) shared by both CV builders — import-only except `--self-test` |
+| — | `cv-trim.mjs` | Relevance-weighted overflow trimming: cut the least-JD-relevant Experience/Project bullet, rebuild, re-render, re-measure until the page cap is met |
 | — | `generate-latex.mjs` | Validate + compile a `.tex` CV to PDF (no npm alias — always invoked directly) |
 | — | `pdf-text.mjs` | Shared poppler-backed PDF verification helper (page count, ATS text-layer checks, rasterization) — imported by `generate-pdf.mjs`/`generate-latex.mjs`/`generate-cover-letter.mjs`, not run standalone except `--self-test` |
 | `npm run sync-check` | `cv-sync-check.mjs` | Validate CV/profile consistency |
@@ -146,6 +149,36 @@ node build-cv-latex.mjs --test
 ```
 
 **Exit codes:** `0` file generated, `1` missing inputs, invalid JSON, unresolved placeholders, or template not found.
+
+---
+
+## build-cv-html
+
+HTML twin of `build:latex`: merges the same structured JSON payload into `templates/cv-template.html` (all HTML escaping handled; `**bold**` is the only inline markup). Any section whose array is empty or absent is omitted entirely — no orphaned headings — and `publications[]` has no truncation code path, so the full list always renders. See `modes/pdf.md` for the payload schema.
+
+```bash
+node build-cv-html.mjs input.json output.html
+node build-cv-html.mjs --test
+```
+
+**Exit codes:** `0` file generated, `1` missing inputs, invalid JSON, unresolved placeholders, or template not found.
+
+---
+
+## cv-trim (mechanized overflow trimming)
+
+The content-trim rung of the overflow ladder in `modes/pdf.md` step 18c / `modes/latex.md` step 14c. Scores every Experience/Project bullet by JD relevance (3× keyword hits + 1× JD-body hits, tokenizer shared with `match-star.mjs`) and uniqueness (1 − max Jaccard vs the other remaining bullets), then cuts the single lowest-scoring bullet, rebuilds via the matching builder, re-renders, re-measures — repeating until the cap is met. Publications/Education/Skills/Certifications are structurally untouchable (never iterated), each entry keeps its last bullet, and bullets an approved cover letter leans on (`--achievements`) are cut only when nothing else is left — flagged as `coverDependentCut` so the letter gets revised. Terminal states are honest: `converged`, `exhausted`, or `max-iterations`; stdout is a single JSON report (progress goes to stderr) and trim-loop renders never write `data/pdf-index.tsv`.
+
+```bash
+node cv-trim.mjs payload.json --format=html --paper=letter --max-pages=2 \
+  --out=output/cv.pdf --jd-keywords=k1,k2 [--achievements=cover-payload.json] [--rasterize]
+node cv-trim.mjs payload.json --format=latex --max-pages=2 --out=output/cv.pdf --jd-keywords=k1,k2
+node cv-trim.mjs --self-test   # pure-function tests, no poppler/Playwright required
+```
+
+`--format=html` renders via `generate-pdf.mjs`'s `renderHtmlToPdf` (with ATS normalization, manifest writes disabled); `--format=latex` shells out to `generate-latex.mjs` and additionally requires `tectonic`/`pdflatex` plus poppler (the loop must compile and count pages every round).
+
+**Exit codes:** `0` any honest terminal state (even non-converged — overflow is a signal, not a failure), `1` operational error (build/compile/render failed), `2` usage error (including refusing to trim without JD keywords).
 
 ---
 
