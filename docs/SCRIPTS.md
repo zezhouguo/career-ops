@@ -13,6 +13,8 @@ All scripts live in the project root as `.mjs` modules and are exposed via `npm 
 | `npm run merge` | `merge-tracker.mjs` | Merge batch TSVs into applications.md |
 | `npm run pdf` | `generate-pdf.mjs` | Convert HTML to ATS-optimized PDF |
 | `npm run build:latex` | `build-cv-latex.mjs` | Build .tex from structured JSON payload |
+| — | `generate-latex.mjs` | Validate + compile a `.tex` CV to PDF (no npm alias — always invoked directly) |
+| — | `pdf-text.mjs` | Shared poppler-backed PDF verification helper (page count, ATS text-layer checks, rasterization) — imported by `generate-pdf.mjs`/`generate-latex.mjs`/`generate-cover-letter.mjs`, not run standalone except `--self-test` |
 | `npm run sync-check` | `cv-sync-check.mjs` | Validate CV/profile consistency |
 | `npm run patterns` | `analyze-patterns.mjs` | Analyze tracker outcomes and report patterns |
 | `npm run add` | `add-entry.mjs` | Dedup + insert a `/career-ops add` entry into cv.md / article-digest.md |
@@ -123,9 +125,14 @@ Renders an HTML file to a print-quality, ATS-parseable PDF via headless Chromium
 npm run pdf -- input.html output.pdf
 npm run pdf -- input.html output.pdf --format=letter   # US letter
 npm run pdf -- input.html output.pdf --format=a4        # A4 (default)
+npm run pdf -- input.html output.pdf --max-pages=2                        # flag (don't fail on) a PDF over N pages
+npm run pdf -- input.html output.pdf --verify-text                        # ATS text-layer checks + page rasterization
+npm run pdf -- input.html output.pdf --verify-text --jd-keywords=k1,k2    # also score keyword coverage against the compiled PDF's real text
 ```
 
-**Exit codes:** `0` PDF generated, `1` missing arguments or generation failure.
+`--verify-text` and rasterization require `pdftotext`/`pdftoppm` (poppler) on PATH — `brew install poppler` (macOS) or `apt install poppler-utils` (Debian/Ubuntu). Both degrade gracefully (skipped, reported unavailable) when poppler isn't installed; generation never fails over it.
+
+**Exit codes:** `0` PDF generated (even on page-count overflow or missing poppler — both are reported, not fatal), `1` missing arguments or generation failure.
 
 ---
 
@@ -139,6 +146,33 @@ node build-cv-latex.mjs --test
 ```
 
 **Exit codes:** `0` file generated, `1` missing inputs, invalid JSON, unresolved placeholders, or template not found.
+
+---
+
+## generate-latex
+
+Validates a generated `.tex` file's structure (section count, required macros, no CJK, `\pdfgentounicode=1` present) and compiles it via `tectonic` (preferred) or `pdflatex`. No npm alias — `modes/latex.md` always invokes it directly since it takes a specific `.tex` path.
+
+```bash
+node generate-latex.mjs input.tex output.pdf
+node generate-latex.mjs input.tex output.pdf --max-pages=2 --verify-text --jd-keywords=k1,k2
+```
+
+`--max-pages`/`--verify-text`/`--jd-keywords` behave exactly as in `pdf` above — this is this script's first-ever page count (previously computed none) and its first ATS text-layer check.
+
+**Exit codes:** `0` compiled successfully, `1` structural validation failed or no LaTeX engine found/compile error.
+
+---
+
+## pdf-text (shared helper, not a standalone workflow)
+
+Poppler-backed PDF verification shared by `generate-pdf.mjs`, `generate-latex.mjs`, and `generate-cover-letter.mjs`: text extraction, exact page counting (via poppler's per-page form-feed), contact-info/keyword-coverage checks, page rasterization for visual QA, and the section-order comparison also used by `generate-pdf.mjs`'s pre-render `validateCvSectionOrder()`. Deliberately has no Playwright dependency so `generate-latex.mjs` can use it without pulling Chromium into a LaTeX-only workflow. Every function degrades gracefully (returns `available: false`, never throws) when poppler isn't installed.
+
+```bash
+node pdf-text.mjs --self-test   # pure-function tests only, no poppler required
+```
+
+**Exit codes:** `0` self-tests passed, `1` a self-test assertion failed.
 
 ---
 

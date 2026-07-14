@@ -87,6 +87,11 @@ location:
 
 cv:
   output_format: "html" # "html" (default) or "latex"
+  # (Optional) Page cap enforced by generate-pdf.mjs/generate-latex.mjs's
+  # --max-pages check (pdf/latex modes). Defaults to 2 when this key is
+  # absent. Raise it if a long publication list genuinely needs more room —
+  # the pipeline never truncates Publications to force a match.
+  # max_pages: 2
   # (Optional) Canva resume design ID for visual CV generation via /career-ops pdf.
   # Find it in your Canva design URL: https://www.canva.com/design/DAxxxxxxx/...
   # The ID starts with "D" and is 11 characters long.

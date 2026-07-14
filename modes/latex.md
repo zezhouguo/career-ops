@@ -16,9 +16,17 @@ Export a tailored, ATS-optimized CV as a `.tex` file and compile it to PDF via `
 10. Inject keywords naturally into existing achievements
 11. Build a JSON payload (see schema below) and write to `/tmp/cv-{candidate}-{company}.json`
 12. Run: `node build-cv-latex.mjs /tmp/cv-{candidate}-{company}.json output/cv-{candidate}-{company}-{YYYY-MM-DD}.tex`
-13. Run: `node generate-latex.mjs output/cv-{candidate}-{company}-{YYYY-MM-DD}.tex output/cv-{candidate}-{company}-{YYYY-MM-DD}.pdf`
-    *(Replace `{candidate}`, `{company}`, `{YYYY-MM-DD}` with actual values.)*
-14. Report: .tex path, .pdf path, file sizes, section count, keyword coverage %
+13. Run: `node generate-latex.mjs output/cv-{candidate}-{company}-{YYYY-MM-DD}.tex output/cv-{candidate}-{company}-{YYYY-MM-DD}.pdf --max-pages={cv.max_pages from profile.yml, default 2} --verify-text --jd-keywords={the keywords from Step 4, comma-joined}`
+    *(Replace `{candidate}`, `{company}`, `{YYYY-MM-DD}` with actual values. `--max-pages` defaults to 2 when `config/profile.yml` has no `cv.max_pages` key.)*
+14. **Verify layout and ATS text-layer, respond to overflow** (skip silently if the JSON report's `textVerification.available` is `false` — `pdftotext`/poppler isn't installed; proceed with whatever page count you have):
+    a. Read `report.pages` (this script's first-ever page count) against `--max-pages`, `report.textVerification.keywordCoverage.percent`, and `report.textVerification.contact`.
+    b. If `report.rasterizedPages` lists image paths, read each one (the `Read` tool renders images natively) and check for orphaned section/entry titles at a page break, overlap, or font issues — same script-measures/agent-judges split as `modes/pdf.md`'s visual-check step.
+    c. **On overflow or an overflow-driven visual defect**, work through this ladder, re-running Step 13 and re-checking after each change, capped at 3-4 rounds before stopping to ask the user:
+       1. **Density nudge (try first):** in `cv-template.tex`, the `\resumeItem`/`\resumeSubheading`/`\resumeProjectHeading` macros end each entry with `\vspace{-3pt}` or `\vspace{-7pt}` — nudge one of these by 1-2pt more negative (e.g. `-3pt` → `-4pt`) directly in the generated `.tex` before recompiling. LaTeX has much less density headroom than the HTML path (this template is already tightly tuned), so don't push further than 1-2pt per round.
+       2. **Content trim:** cut the single least-relevant bullet from `experience[].bullets`/`projects[].bullets` in the JSON payload (weakest tie to the JD keywords, not redundant with the cover letter), rebuild via Step 12, recompile, re-check. One bullet at a time. **Never cut anything from `education[]`/`skills[]`** and never trim a Publications list if one is present in cv.md — this template has no dedicated Publications section yet, so if the candidate's CV has one, prefer `pdf` mode (HTML) until that lands.
+       3. **Escape hatch:** if fully trimmed and still overflowing, stop and tell the user — raise `cv.max_pages` or accept the page count, rather than silently violating a "never truncate" content rule.
+    d. If `report.textVerification.contact.emailFound`/`phoneFound` is `false`, or coverage looks unexpectedly low, that's a rendering issue (e.g. a LaTeX escaping/font problem), not overflow — flag it rather than running the ladder above.
+15. Report: .tex path, .pdf path, file sizes, section count, page count (vs. cap), JD-keyword coverage % (script-computed), contact-info-parseable (yes/no), and any bullet(s) cut in Step 14c.
 
 **Requires:** `tectonic` (preferred — `brew install tectonic`, auto-downloads packages) or `pdflatex` (MiKTeX / TeX Live) on PATH.
 

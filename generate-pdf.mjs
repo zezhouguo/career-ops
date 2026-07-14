@@ -4,7 +4,7 @@
  * generate-pdf.mjs — HTML → PDF via Playwright
  *
  * Usage:
- *   node career-ops/generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4] [--report=NNN] [--allow-reorder]
+ *   node career-ops/generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4] [--report=NNN] [--allow-reorder] [--max-pages=N] [--verify-text] [--jd-keywords=k1,k2,...]
  *
  * --report links the generated PDF to its tracker/report number and records
  * the linkage in data/pdf-index.tsv so downstream tools (e.g. the TUI
@@ -17,6 +17,20 @@
  * role) rather than accidentally scrambled by an agent. Without this flag,
  * any divergence from cv.md's section order still fails generation.
  *
+ * --max-pages=N flags (does not fail generation on) a PDF that renders to
+ * more than N pages — the result's `overflow` field is set to true so the
+ * caller can decide whether to trim/adjust and regenerate.
+ *
+ * --verify-text runs the ATS text-layer checks from pdf-text.mjs against the
+ * compiled PDF (contact info parseable, section order from extracted text,
+ * JD-keyword coverage if --jd-keywords is also given) AND rasterizes each
+ * page to PNG (via pdftoppm/pdftocairo) for the calling agent's own visual
+ * inspection (orphaned headings, overlap, font-fallback artifacts) — mirrors
+ * modes/pdf.md's existing Canva sub-flow's screenshot-then-inspect pattern,
+ * extended to the default path. Requires `pdftotext`/`pdftoppm` (poppler) on
+ * PATH; degrades gracefully (skipped, reported as unavailable) if missing —
+ * never fails generation over a missing optional tool.
+ *
  * Requires: @playwright/test (or playwright) installed.
  * Uses Chromium headless to render the HTML and produce a clean, ATS-parseable PDF.
  */
@@ -27,12 +41,42 @@ import { readFile } from 'fs/promises';
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'fs';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { randomUUID } from 'node:crypto';
+import {
+  detectPdftotext,
+  extractPdfText,
+  countPagesFromExtractedText,
+  checkContactInfoParseable,
+  checkKeywordCoverage,
+  compareSectionOrder,
+  extractSourceSectionOrder,
+  extractSectionOrderFromText,
+  normalizeSectionTitle,
+  sectionKey,
+  rasterizePages,
+} from './pdf-text.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PDF_PAGE_MARGIN = '0.6in';
 
 // Ensure output directory exists (fresh setup)
 mkdirSync(resolve(__dirname, 'output'), { recursive: true });
+
+/**
+ * Read email/phone from config/profile.yml for the ATS contact-info check.
+ * Lightweight line-regex pick (matching prepare-application.mjs's
+ * readProfile() convention) rather than a full YAML parse, since this file
+ * only ever needs these two scalar fields.
+ */
+function readContactFromProfile() {
+  const profilePath = resolve(__dirname, 'config', 'profile.yml');
+  if (!existsSync(profilePath)) return {};
+  const raw = readFileSync(profilePath, 'utf-8');
+  const pick = (key) => {
+    const m = raw.match(new RegExp(`^\\s*${key}:\\s*["']?([^"'\\n]+?)["']?\\s*$`, 'm'));
+    return m ? m[1].trim() : '';
+  };
+  return { email: pick('email'), phone: pick('phone') };
+}
 
 /**
  * Normalize text for ATS compatibility by converting problematic Unicode.
@@ -101,60 +145,12 @@ function normalizeTextForATS(html) {
   }
 }
 
-const SECTION_ALIASES = new Map([
-  ['summary', 'summary'],
-  ['professional summary', 'summary'],
-  ['competencies', 'competencies'],
-  ['core competencies', 'competencies'],
-  ['experience', 'experience'],
-  ['work experience', 'experience'],
-  ['professional experience', 'experience'],
-  ['projects', 'projects'],
-  ['selected projects', 'projects'],
-  ['personal projects', 'projects'],
-  ['education', 'education'],
-  ['education & certifications', 'education'],
-  ['certifications', 'certifications'],
-  ['skills', 'skills'],
-  ['technical skills', 'skills'],
-]);
-
-function normalizeSectionTitle(text) {
-  return text
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\{\{[^}]+\}\}/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/[*_`~]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
-}
-
-function sectionKey(text) {
-  const normalized = normalizeSectionTitle(text);
-  return SECTION_ALIASES.get(normalized) ?? normalized;
-}
-
 function extractRenderedSectionOrder(html) {
   const titleMatches = [...html.matchAll(/class=["'][^"']*\bsection-title\b[^"']*["'][^>]*>([\s\S]*?)<\/[^>]+>/gi)];
   const sections = [];
 
   for (const match of titleMatches) {
     const text = normalizeSectionTitle(match[1]);
-    if (!text) continue;
-    sections.push({ key: sectionKey(text), title: text });
-  }
-
-  return sections;
-}
-
-function extractSourceSectionOrder(markdown) {
-  const sections = [];
-
-  for (const line of markdown.split(/\r?\n/)) {
-    const heading = line.match(/^\s{0,3}(#{1,6})\s+(.+?)\s*#*\s*$/);
-    if (!heading) continue;
-    const text = normalizeSectionTitle(heading[2]);
     if (!text) continue;
     sections.push({ key: sectionKey(text), title: text });
   }
@@ -170,32 +166,22 @@ function extractSourceSectionOrder(markdown) {
  *   where the section order was deliberately tailored (e.g. Projects moved
  *   ahead of Education for a technical-heavy role) rather than accidentally
  *   scrambled by an agent. See #1646.
+ *
+ * Thin wrapper: the actual comparison is shared with the extracted-PDF-text
+ * check in pdf-text.mjs's compareSectionOrder() (relocated there rather than
+ * duplicated, since pdf-text.mjs must stay Playwright-free and so cannot
+ * import anything from this file).
  */
 export function validateCvSectionOrder(html, cvMarkdown, { allowReorder = false } = {}) {
   const rendered = extractRenderedSectionOrder(html);
   const source = extractSourceSectionOrder(cvMarkdown);
-  if (rendered.length < 2 || source.length < 2) return;
-
-  const sourcePositions = new Map(source.map((section, index) => [section.key, index]));
-  const renderedComparable = rendered.filter(section => sourcePositions.has(section.key));
-  if (renderedComparable.length < 2) return;
-
-  for (let i = 1; i < renderedComparable.length; i++) {
-    const previous = renderedComparable[i - 1];
-    const current = renderedComparable[i];
-    if (sourcePositions.get(current.key) < sourcePositions.get(previous.key)) {
-      const renderedOrder = renderedComparable.map(section => section.title).join(' -> ');
-      const sourceOrder = source
-        .filter(section => renderedComparable.some(renderedSection => renderedSection.key === section.key))
-        .map(section => section.title)
-        .join(' -> ');
-      const message = `CV section order diverges from cv.md: rendered ${renderedOrder}; cv.md ${sourceOrder}`;
-      if (allowReorder) {
-        console.warn(`⚠️  ${message} (proceeding — --allow-reorder set)`);
-        return;
-      }
-      throw new Error(message);
-    }
+  const result = compareSectionOrder(rendered, source, { allowReorder });
+  if (result.warning) {
+    console.warn(`⚠️  ${result.warning} (proceeding — --allow-reorder set)`);
+    return;
+  }
+  if (!result.ok) {
+    throw new Error(result.error);
   }
 }
 
@@ -282,6 +268,7 @@ async function generatePDF() {
 
   // Parse arguments
   let inputPath, outputPath, format = 'a4', reportNum = '', allowReorder = false;
+  let maxPages = null, verifyText = false, jdKeywords = [];
 
   for (const arg of args) {
     if (arg.startsWith('--format=')) {
@@ -290,6 +277,12 @@ async function generatePDF() {
       reportNum = arg.split('=')[1].trim();
     } else if (arg === '--allow-reorder') {
       allowReorder = true;
+    } else if (arg.startsWith('--max-pages=')) {
+      maxPages = parseInt(arg.split('=')[1], 10);
+    } else if (arg === '--verify-text') {
+      verifyText = true;
+    } else if (arg.startsWith('--jd-keywords=')) {
+      jdKeywords = arg.slice('--jd-keywords='.length).split(',').map((k) => k.trim()).filter(Boolean);
     } else if (!inputPath) {
       inputPath = arg;
     } else if (!outputPath) {
@@ -298,7 +291,7 @@ async function generatePDF() {
   }
 
   if (!inputPath || !outputPath) {
-    console.error('Usage: node generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4] [--report=NNN] [--allow-reorder]');
+    console.error('Usage: node generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4] [--report=NNN] [--allow-reorder] [--max-pages=N] [--verify-text] [--jd-keywords=k1,k2,...]');
     console.error('');
     console.error('This script only converts an already-built HTML file to PDF.');
     console.error('The input HTML is produced by the pdf mode: the agent fills cv-template.html');
@@ -310,6 +303,11 @@ async function generatePDF() {
 
   if (reportNum && !/^\d+$/.test(reportNum)) {
     console.error(`Invalid --report "${reportNum}". Use the numeric tracker/report number, e.g. --report=018`);
+    process.exit(1);
+  }
+
+  if (maxPages !== null && (!Number.isInteger(maxPages) || maxPages < 1)) {
+    console.error(`Invalid --max-pages "${maxPages}". Use a positive integer, e.g. --max-pages=2`);
     process.exit(1);
   }
 
@@ -356,7 +354,19 @@ async function generatePDF() {
     console.log(`🧹 ATS normalization: ${totalReplacements} replacements (${breakdown})`);
   }
 
-  return renderHtmlToPdf(html, outputPath, { format, baseDir: dirname(inputPath), reportNum, inputPath });
+  const contact = verifyText ? readContactFromProfile() : {};
+
+  return renderHtmlToPdf(html, outputPath, {
+    format,
+    baseDir: dirname(inputPath),
+    reportNum,
+    inputPath,
+    maxPages,
+    verifyText,
+    jdKeywords,
+    contact,
+    cvMarkdown,
+  });
 }
 
 /**
@@ -412,14 +422,22 @@ export async function inlineLocalFonts(html) {
  *
  * @param {string} html - Full HTML document to render.
  * @param {string} outputPath - Absolute path to write the PDF to.
- * @param {{format?: 'a4'|'letter', baseDir?: string, reportNum?: string, inputPath?: string}} [opts]
- * @returns {Promise<{outputPath: string, pageCount: number, size: number}>}
+ * @param {{format?: 'a4'|'letter', baseDir?: string, reportNum?: string, inputPath?: string, maxPages?: number|null, verifyText?: boolean, jdKeywords?: string[], contact?: {email?: string, phone?: string}}} [opts]
+ * @returns {Promise<{outputPath: string, pageCount: number, size: number, overflow?: boolean, textVerification?: object}>}
  */
 export async function renderHtmlToPdf(html, outputPath, opts = {}) {
   const format = opts.format || 'a4';
   const baseDir = opts.baseDir || process.cwd();
   const reportNum = opts.reportNum || '';
   const inputPath = opts.inputPath || '';
+  const maxPages = opts.maxPages ?? null;
+  const verifyText = opts.verifyText || false;
+  const jdKeywords = opts.jdKeywords || [];
+  const contact = opts.contact || {};
+  // Preserved across the try block for the post-render text-verification
+  // pass below, which needs the same cv.md content extractRenderedSectionOrder
+  // was already compared against pre-render.
+  const cvMarkdownForVerify = opts.cvMarkdown || '';
 
   mkdirSync(dirname(outputPath), { recursive: true });
 
@@ -467,6 +485,59 @@ export async function renderHtmlToPdf(html, outputPath, opts = {}) {
     console.log(`📊 Pages: ${pageCount}`);
     console.log(`📦 Size: ${(pdfBuffer.length / 1024).toFixed(1)} KB`);
 
+    const result = { outputPath, pageCount, size: pdfBuffer.length };
+
+    if (maxPages !== null) {
+      result.overflow = pageCount > maxPages;
+      if (result.overflow) {
+        console.warn(`⚠️  Page count ${pageCount} exceeds --max-pages=${maxPages}`);
+      }
+    }
+
+    if (verifyText) {
+      if (!detectPdftotext()) {
+        console.log('ℹ️  --verify-text requested but pdftotext (poppler) is not on PATH — skipping ATS text-layer checks. Install with `brew install poppler` (macOS) or `apt install poppler-utils` (Debian/Ubuntu).');
+        result.textVerification = { available: false };
+      } else {
+        const extracted = extractPdfText(outputPath);
+        const textVerification = { available: extracted.available };
+        if (extracted.available) {
+          const extractedPageCount = countPagesFromExtractedText(extracted.text);
+          textVerification.extractedPageCount = extractedPageCount;
+          if (extractedPageCount !== pageCount) {
+            console.warn(`⚠️  Page count mismatch: PDF-structure count=${pageCount}, pdftotext form-feed count=${extractedPageCount}`);
+          }
+          textVerification.contact = checkContactInfoParseable(extracted.text, contact);
+          if (contact.email || contact.phone) {
+            const parts = [];
+            if (contact.email) parts.push(`email ${textVerification.contact.emailFound ? '✅' : '❌ NOT FOUND'}`);
+            if (contact.phone) parts.push(`phone ${textVerification.contact.phoneFound ? '✅' : '❌ NOT FOUND'}`);
+            console.log(`📇 Contact info parseable: ${parts.join(', ')}`);
+          }
+          if (jdKeywords.length > 0) {
+            textVerification.keywordCoverage = checkKeywordCoverage(extracted.text, jdKeywords);
+            console.log(`🔍 JD keyword coverage: ${textVerification.keywordCoverage.percent}% (${textVerification.keywordCoverage.matched.length}/${jdKeywords.length})`);
+          }
+          if (cvMarkdownForVerify) {
+            const renderedFromText = extractSectionOrderFromText(extracted.text);
+            const sourceOrder = extractSourceSectionOrder(cvMarkdownForVerify);
+            const orderCheck = compareSectionOrder(renderedFromText, sourceOrder, { allowReorder: true });
+            textVerification.sectionOrderSane = orderCheck.ok !== false;
+            if (orderCheck.warning) console.warn(`⚠️  ${orderCheck.warning} (from extracted PDF text)`);
+          }
+        }
+        result.textVerification = textVerification;
+
+        const raster = rasterizePages(outputPath);
+        if (raster.available) {
+          console.log(`🖼️  Rasterized ${raster.files.length} page(s) for visual inspection (via ${raster.tool}): ${raster.files.join(', ')}`);
+          result.rasterizedPages = raster.files;
+        } else {
+          console.log('ℹ️  Page rasterization unavailable (pdftoppm/pdftocairo not on PATH) — skipping visual-inspection images.');
+        }
+      }
+    }
+
     try {
       updatePDFManifest(reportNum, outputPath, inputPath, format);
       console.log(`🔗 Manifest: data/pdf-index.tsv updated${reportNum ? ` (report ${reportNum})` : ' (no --report given)'}`);
@@ -475,7 +546,7 @@ export async function renderHtmlToPdf(html, outputPath, opts = {}) {
       console.error(`⚠️  Manifest update failed: ${err.message}`);
     }
 
-    return { outputPath, pageCount, size: pdfBuffer.length };
+    return result;
   } finally {
     await browser.close();
     // Clean up temp file

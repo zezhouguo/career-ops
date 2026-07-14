@@ -242,6 +242,9 @@ Availability + any gap acknowledgments the user chose to include (Step 5).
 
 [Language closing — if applicable]
 Only if user confirmed inclusion in Step 5. Written in that language. Italic in PDF.
+
+[Signature]
+"Sincerely," (or a tone-matched alternative for the Step 6D tone choice — e.g. "Best," reads better for Direct) followed by the candidate's name. Always included — never omit the sign-off.
 ```
 
 End the draft with: "How does this read? Once you approve I'll generate the PDF."
@@ -295,7 +298,8 @@ Assemble the JSON payload:
     ],
     "problems_section": "{approved problems paragraph}",
     "closing": "{approved closing}",
-    "language_closing": "{approved language sentence or null}"
+    "language_closing": "{approved language sentence or null}",
+    "sign_off": "{optional, e.g. 'Best,' for a Direct tone; defaults to 'Sincerely,' when omitted — the sign-off is always rendered, never skipped}"
   },
   "output_path": "output/{company-slug}-{role-slug}-cover.pdf"
 }
@@ -305,10 +309,15 @@ Write payload to `/tmp/cover-payload-{company-slug}.json`.
 
 Run:
 ```bash
-node generate-cover-letter.mjs --payload /tmp/cover-payload-{company-slug}.json
+node generate-cover-letter.mjs --payload /tmp/cover-payload-{company-slug}.json --max-pages 1 --verify-text --jd-keywords {the ATS-critical keywords from Step 4, comma-joined}
 ```
 
-Report the output path and file size.
+**Verify layout and ATS text-layer** (skip silently if the console reports pdftotext/poppler unavailable):
+1. Read the console output: page count vs. the 1-page cap, and (if available) whether contact info parsed cleanly.
+2. If a `🖼️ Rasterized` line reports an image path, read it (the `Read` tool renders images natively) and confirm: the letter fits on 1 page, the signature from Step 8 is visibly present and correctly placed, and fonts are consistent — the same script-measures/agent-judges split `modes/pdf.md`'s visual-check step uses.
+3. **If it overflows 1 page:** this letter's text is already user-approved (Step 8's gate), so do NOT auto-cut it the way CV bullets get trimmed. Instead, propose specific sentences/bullets to shorten, show the proposal to the user, and only regenerate after they approve the shorter version.
+
+Report the output path, file size, and the verification results above.
 
 ---
 
@@ -319,6 +328,7 @@ After the PDF is confirmed, add a brief note:
 - Any JD keywords from Step 4 that could not be incorporated naturally (flag for manual review)
 - Which gap acknowledgments were included and which were omitted, and why
 - Whether the word count hit the 350-420 target (if short or long, note it)
+- The page-count and visual-check outcome from Step 9's verification (or note that it was skipped because poppler isn't installed)
 
 ---
 

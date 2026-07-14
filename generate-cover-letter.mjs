@@ -87,6 +87,25 @@ function buildAchievementsBlock(achievements) {
   return `<ul class="achievements">\n${items}\n  </ul>`;
 }
 
+/**
+ * Plain-text, ATS-safe sign-off ("Sincerely,\n{Name}") — no image, no script
+ * font, since a scanned-signature graphic would defeat the whole point of
+ * text-layer ATS verification (pdf-text.mjs's checkContactInfoParseable/
+ * checkKeywordCoverage). Defaults to "Sincerely," rather than omitting the
+ * block when letter.sign_off is absent — matching the user's own prior
+ * correction on this exact class of bug (modes/_custom.md: "Always include
+ * a salutation line... do not rely on the 'omit if no name' default").
+ *
+ * Calls escapeHtml(candidate.name) directly rather than emitting the literal
+ * token string "{{NAME}}" — buildHtml()'s substitution is a single,
+ * non-recursive pass (see its own comment above), so a nested token here
+ * would render as literal text, not the candidate's name.
+ */
+function buildSignatureBlock(letter, candidate) {
+  const signOff = escapeHtml(letter.sign_off || "Sincerely,");
+  return `<p class="signature">${signOff}<br>${escapeHtml(candidate.name)}</p>`;
+}
+
 function buildFootnotesBlock(footnotes) {
   if (!footnotes || !footnotes.length) return "";
   const lines = footnotes.map(fn => {
@@ -136,6 +155,7 @@ export function buildHtml(payload) {
     "{{PROBLEMS_BLOCK}}": problemsBlock,
     "{{CLOSING_BLOCK}}": closingBlock,
     "{{LANGUAGE_CLOSING_BLOCK}}": languageClosingBlock,
+    "{{SIGNATURE_BLOCK}}": buildSignatureBlock(letter, candidate),
     "{{FOOTNOTES_BLOCK}}": buildFootnotesBlock(letter.footnotes),
   };
 
@@ -150,9 +170,12 @@ export function buildHtml(payload) {
 async function main() {
   const { values: args } = parseArgs({
     options: {
-      payload: { type: "string" },
-      out:     { type: "string" },
-      help:    { type: "boolean", short: "h" },
+      payload:     { type: "string" },
+      out:         { type: "string" },
+      help:        { type: "boolean", short: "h" },
+      "max-pages": { type: "string" },
+      "verify-text": { type: "boolean" },
+      "jd-keywords": { type: "string" },
     },
     strict: false,
   });
@@ -160,10 +183,13 @@ async function main() {
   if (args.help || !args.payload) {
     console.log(`
 Usage:
-  node generate-cover-letter.mjs --payload payload.json [--out output/path.pdf]
+  node generate-cover-letter.mjs --payload payload.json [--out output/path.pdf] [--max-pages N] [--verify-text] [--jd-keywords k1,k2,...]
 
-  --payload   Path to the JSON payload file (required)
-  --out       Override output path from payload (optional)
+  --payload      Path to the JSON payload file (required)
+  --out          Override output path from payload (optional)
+  --max-pages    Flag (does not fail generation on) a PDF over N pages (default 1)
+  --verify-text  Run ATS text-layer checks (contact info, keyword coverage) via pdf-text.mjs; requires pdftotext (poppler)
+  --jd-keywords  Comma-separated keywords for --verify-text's coverage check
 `);
     process.exit(args.help ? 0 : 1);
   }
@@ -196,7 +222,21 @@ Usage:
   try {
     const html = buildHtml(payload);
     const outputPath = resolve(payload.output_path);
-    await renderHtmlToPdf(html, outputPath, { format: "a4" });
+    const maxPages = args["max-pages"] ? parseInt(args["max-pages"], 10) : 1;
+    const jdKeywords = args["jd-keywords"]
+      ? args["jd-keywords"].split(",").map((k) => k.trim()).filter(Boolean)
+      : [];
+    // Contact info for the ATS check comes straight from the payload's own
+    // candidate block (the same values already rendered into the letter's
+    // contact line) rather than re-reading config/profile.yml separately.
+    const contact = { email: payload.candidate?.email, phone: payload.candidate?.phone };
+    await renderHtmlToPdf(html, outputPath, {
+      format: "a4",
+      maxPages,
+      verifyText: !!args["verify-text"],
+      jdKeywords,
+      contact,
+    });
     console.log(`\nCover letter PDF: ${payload.output_path}`);
   } catch (err) {
     console.error("ERROR generating cover letter PDF:");
