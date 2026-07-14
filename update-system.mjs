@@ -311,6 +311,7 @@ const USER_PATHS = [
   '.mcp.json',
   'RESUME.md',
   'batch/tracker-additions/merged/',
+  '.codex/',
 ];
 
 function parseVersionFile(raw) {

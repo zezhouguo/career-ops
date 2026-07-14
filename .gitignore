@@ -20,6 +20,9 @@ batch/batch-state.tsv
 batch/batch-input.tsv
 batch/tracker-additions/**/*.tsv
 !batch/tracker-additions/.gitkeep
+# Intermediate apply-flow capture; the durable record is the report's
+# "## Application Answers" section (see e.g. reports/118).
+batch/*-application-answers.json
 jds/*
 !jds/.gitkeep
 
