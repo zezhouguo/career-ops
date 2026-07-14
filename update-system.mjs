@@ -303,6 +303,14 @@ const USER_PATHS = [
   'plugins.local/',
   'plugins.lock',
   '.claude/settings.json',
+  // Local user-owned artifacts tracked in this instance, classified per the
+  // remediation guidance printed by validate-system-paths-coverage.mjs.
+  // NOTE: no apostrophes/quotes in comments inside this array — the checker
+  // re-parses this literal from source text with a quote-pair regex
+  // (extractArrayFromSource), and a stray quote mispairs the entries.
+  '.mcp.json',
+  'RESUME.md',
+  'batch/tracker-additions/merged/',
 ];
 
 function parseVersionFile(raw) {
