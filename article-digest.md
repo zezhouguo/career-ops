@@ -37,7 +37,7 @@ Dissertation: **"Enabling High-Energy Lithium-Metal Batteries with High-Nickel C
 
 **Cell formats:** CR2032 coin half-cells; Li|Cu & Li|Li symmetric; anode-free Cu|LNO; single-layer **pouch full cells** (graphite and Li-metal, N/P ≈ 1.1); LFP-counter GEIS cells.
 
-**Interphase / materials characterization:** XRD (ex-situ + **in-situ XRD**, Rietveld), **XPS** with Ar⁺ depth profiling, **ToF-SIMS** (depth profiles, 3D reconstruction, 2D maps, **FIB cross-sections**, NSD colocalization), **SEM** (ion-milled cross-section + top-view), **OEMS**, **DSC/TGA**, **FT-IR**, **⁷Li / ¹⁹F NMR**, ICP/BET, potentiometric H-cell solvation energy.
+**Interphase / materials characterization:** XRD (ex-situ + **in-situ XRD**, Rietveld), **XPS** with Ar⁺ depth profiling, **ToF-SIMS** (depth profiles, 3D reconstruction, 2D maps, **FIB cross-sections**, NSD colocalization), **SEM** (ion-milled cross-section + top-view), **TEM** (cathode-surface structural reconstruction to rock-salt/spinel phases, compared across cathode compositions and states of charge/cycling), **AFM** (Li-metal deposition surface morphology as a function of electrolyte), **OEMS**, **DSC/TGA**, **FT-IR**, **⁷Li / ¹⁹F NMR**, ICP/BET, potentiometric H-cell solvation energy.
 
 **Electrochemistry:** galvanostatic cycling, rate, **dQ/dV**, **EIS**, **GEIS**, **DRT** deconvolution, **GITT** (Weppner–Huggins), **PITT**, **LSV**, CV/potentiostatic holds, Aurbach CE.
 
@@ -55,6 +55,7 @@ Dissertation: **"Enabling High-Energy Lithium-Metal Batteries with High-Nickel C
   - Delivered the first direct experimental evidence of anode-to-cathode crossover in Li-metal batteries.
   - Engineered a delithiated-LFP GEIS + DRT protocol to isolate cathode-only impedance inside full pouch cells.
   - Combined DRT, depth-XPS, and 3D ToF-SIMS/FIB to show Li-metal pairing thickens the cathode CEI and raises charge-transfer resistance — most on high-Ni NMC90.
+  - Used TEM to resolve cathode-surface structural degradation into rock-salt and spinel phases, comparing the reconstruction across cathode compositions and states of charge/cycling.
   - Reframed durable-LMB design around cross-interface (not single-electrode) stability.
 
 ### 2. *Adv. Funct. Mater.* 2025, 35(40), 2501743 — TM-ion crossover onto Li-metal (Guo, Cui, Manthiram)
@@ -63,6 +64,7 @@ Dissertation: **"Enabling High-Energy Lithium-Metal Batteries with High-Nickel C
 - **Proof points:**
   - Showed dissolved TM ions poison the Li-metal SEI, dropping CE from 99.34% to as low as 96.38%, and cutting Li|NMC811 life to 160 (Co²⁺) / 240 (Mn²⁺) cycles while Ni²⁺ preserved stability — a direct electrochemical case for high-Ni, low-Mn/Co chemistries with Li-metal anodes.
   - Resolved the molecular mechanism via depth-XPS + 3D ToF-SIMS + DRT-EIS (TM–DME complexation).
+  - Used AFM to map how different electrolytes shape Li-metal deposition surface morphology, linking plating uniformity to SEI chemistry.
 
 ### 3. *ACS Energy Lett.* 2024, 9(7), 3316–3323 — High-cutoff formation protocol (Guo, Cui, Manthiram)
 - **System:** LNO + 95%-Ni single-doped (NM/NC/NA/NMg-95); Li|LNO half cells & Gr|LNO pouch full cells; 1C = 180 mAh/g.
