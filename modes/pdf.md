@@ -17,9 +17,10 @@
 11. Build competency grid from JD requirements (6-8 keyword phrases)
 12. Inject keywords naturally into existing achievements (NEVER invent)
 13. Apply the six-second clarity gate from `modes/heuristics/recruiter-side.md`: top third must make target role, strongest fit, and proof obvious
-14. Generate full HTML from template + personalized content
-15. Read `name` from `config/profile.yml` → normalize to kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`
-16. Write HTML to `output/cv-{candidate}-{company}.html` (NOT a temp dir — the recorded HTML is what the dashboard's `D` hotkey regenerates from, so it must survive temp cleanup)
+14. Read `name` from `config/profile.yml` → normalize to kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`
+15. Assemble the CV JSON payload (see "JSON payload" below) from the tailored content of Steps 8-13: `summary`, `competencies[]` (Step 11's grid), `experience[]` with the reordered `bullets[]`, the selected `projects[]`, `education[]`, `skills[]`, and — when cv.md has them — the FULL `publications[]` list (never sliced). Write it to `output/cv-{candidate}-{company}-payload.json`.
+16. Run `node build-cv-html.mjs output/cv-{candidate}-{company}-payload.json output/cv-{candidate}-{company}.html` to render the ATS-safe HTML. Write to `output/`, NOT a temp dir — the recorded HTML is what the dashboard's `D` hotkey regenerates from, so it must survive temp cleanup. The builder omits any section whose array is empty, so an absent Projects/Certifications section leaves no orphaned heading.
+    - **Fallback (rare):** if a role genuinely needs a section-*level* reorder or bespoke markup the builder doesn't model, hand-author the HTML directly from `templates/cv-template.html` and skip the builder. This legacy path exists for the exception, not the default.
 17. Execute: `node generate-pdf.mjs output/cv-{candidate}-{company}.html output/cv-{candidate}-{company}-{YYYY-MM-DD}.pdf --format={letter|a4} --report={report number} --max-pages={cv.max_pages from profile.yml, default 2} --verify-text --jd-keywords={the keywords from Step 3, comma-joined}` — `{report number}` is the NNN from the report filename/link (e.g. `008` for `reports/008-acme-….md`), not the tracker `#` column. Pass it whenever the application has (or will have) a report; it records the PDF↔report linkage in `data/pdf-index.tsv` so the dashboard can open and regenerate the exact PDF. Omit it only for one-off CVs with no tracker entry. `--max-pages` defaults to 2 when `config/profile.yml` has no `cv.max_pages` key — set that key (sibling to `cv.output_format`) to override, e.g. for a long publication list that genuinely needs more room.
 18. **Verify layout and ATS text-layer, respond to overflow (skip silently if the console says `pdftotext (poppler) is not on PATH` — proceed with whatever the page-count-only check already gave you):**
     a. Read the script's console output: page count vs. `--max-pages`, JD-keyword coverage % (now computed from the compiled PDF's real text layer, not eyeballed), and whether contact info parsed cleanly.
@@ -30,6 +31,44 @@
        3. **Escape hatch:** if every non-Publications bullet is already cut and it still overflows (a real scenario for a long publication list), stop and tell the user directly — raise `cv.max_pages` in `config/profile.yml`, or accept the current page count. Never silently violate the "complete publication list" rule from `modes/_custom.md` to force a page-count match.
     d. If contact info didn't parse cleanly (`contact.emailFound`/`contact.phoneFound` false) or keyword coverage looks unexpectedly low, that's a rendering issue (e.g. font substitution garbling text) rather than an overflow issue — flag it to the user rather than trying the overflow ladder above, which won't fix it.
 19. Report: PDF path, number of pages (vs. cap), JD-keyword coverage % (script-computed), contact-info-parseable (yes/no), and — if Step 18c ran — which bullet(s) were cut and why.
+
+## JSON payload (build-cv-html.mjs)
+
+`build-cv-html.mjs` merges this payload into `templates/cv-template.html` and handles ALL HTML escaping — never pre-escape. Inside a bullet, `**bold**` marks a bold lead phrase; that is the only inline markup (not a markdown parser). Any section whose array is empty or absent is omitted entirely, so no orphaned heading is left behind. Section order is fixed by the template (see "Section order" below); the Step 16 Fallback covers the rare section-reorder case.
+
+```json
+{
+  "lang": "en",
+  "name": "Jane Smith, Ph.D.",
+  "phone": "+1 415 555 0100",
+  "email": "jane@example.com",
+  "linkedin": { "url": "https://linkedin.com/in/janesmith", "display": "linkedin.com/in/janesmith" },
+  "portfolio": { "url": "https://scholar.google.com/citations?user=...", "display": "Google Scholar" },
+  "location": "Austin, TX (open to relocation)",
+  "section_titles": { "publications": "Publications" },
+  "summary": "Professional summary text (may use **bold**).",
+  "competencies": ["Depth-Profiled XPS", "3D ToF-SIMS", "DFT"],
+  "experience": [
+    { "company": "Company", "role": "Title", "location": "City, ST", "dates": "2024 - Present", "bullets": ["**Led** a program that…", "Cut cost 30% via…"] }
+  ],
+  "projects": [
+    { "name": "Project", "badge": "OSS", "context": "Python, SQL", "bullets": ["What you built"] }
+  ],
+  "education": [
+    { "degree": "Ph.D., Materials Science", "institution": "UT Austin", "dates": "Dec 2025", "desc": "GPA 3.86/4.00", "coursework": ["Solid State"] }
+  ],
+  "certifications": [ { "title": "Six Sigma Green Belt", "org": "ASQ", "year": "2024" } ],
+  "skills": [ { "category": "Microanalysis", "items": ["XPS", "ToF-SIMS", "FIB-SEM"] } ],
+  "publications": [
+    { "text": "Guo, Z.; Co-author, A. Paper Title.", "emphasis": "Guo, Z.", "venue": "Adv. Mater.", "detail": "2026, e18490." }
+  ]
+}
+```
+
+- **`publications[]` is the full list from cv.md.** `build-cv-html.mjs` has no truncation code path, so it can never shorten it. Overflow is resolved by the Step 18 ladder (density nudge, then Experience/Project bullet trim), never by cutting publications.
+- `emphasis` bolds the candidate's own name at its first occurrence; `venue` renders italic. A publication entry may instead be a plain string when you don't need those.
+- `linkedin`/`portfolio`/`github` each take `{ url, display }`; a missing one is skipped (no dangling separator). `photo` is an opt-in field (empty by default — see the profile-photo note).
+- `section_titles` is optional and English by default; set it for localized CVs (e.g. German `"experience": "Berufserfahrung"`).
 
 ## ATS Rules (clean parsing)
 
@@ -69,6 +108,7 @@
 5. Projects (top 3-4 most relevant)
 6. Education & Certifications
 7. Skills (languages + technical)
+8. Publications (only when cv.md has them — full list, never truncated; renders last)
 
 ## Keyword injection strategy (ethical, truth-based)
 

@@ -3,8 +3,9 @@
 import { readFile, writeFile, stat } from 'fs/promises';
 import { existsSync } from 'fs';
 import { resolve, dirname, basename, join } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { tmpdir } from 'os';
+import { sanitizeUrl, splitBoldSpans } from './cv-payload-utils.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_PATH = resolve(__dirname, 'templates', 'cv-template.tex');
@@ -33,21 +34,13 @@ function escapeLatex(text, mode = 'text') {
   return out.join('');
 }
 
-function sanitizeUrl(url) {
-  if (typeof url !== 'string') return '';
-  url = url.trim();
-  if (!url) return '';
-  const allowedSchemes = ['mailto:', 'http:', 'https:'];
-  const hasScheme = allowedSchemes.some(s => url.toLowerCase().startsWith(s));
-  if (!hasScheme) {
-    if (url.includes('@') && !url.includes('/')) {
-      url = 'mailto:' + url;
-    } else {
-      url = 'https://' + url;
-    }
-  }
-  url = url.replace(/[{}%$#\\~^]/g, '');
-  return url;
+// sanitizeUrl now lives in cv-payload-utils.mjs (shared with build-cv-html.mjs).
+
+/** Render text honoring the **bold** convention → LaTeX with \textbf{}. */
+function renderLatexRich(text) {
+  return splitBoldSpans(typeof text === 'string' ? text : '')
+    .map((s) => (s.bold ? `\\textbf{${escapeLatex(s.text)}}` : escapeLatex(s.text)))
+    .join('');
 }
 
 function buildEducation(entries) {
@@ -70,7 +63,7 @@ function buildExperience(entries) {
   const blocks = [];
   for (const e of entries) {
     if (!e) continue;
-    const bullets = Array.isArray(e.bullets) ? e.bullets.map(b => `            \\resumeItem{${escapeLatex(b)}}`).join('\n') : '';
+    const bullets = Array.isArray(e.bullets) ? e.bullets.map(b => `            \\resumeItem{${renderLatexRich(b)}}`).join('\n') : '';
     blocks.push(`    \\resumeSubheading\n      {${escapeLatex(e.company)}}{${escapeLatex(e.dates)}}\n      {${escapeLatex(e.role)}}{${escapeLatex(e.location)}}\n      \\resumeItemListStart\n${bullets}\n      \\resumeItemListEnd`);
   }
   return blocks.join('\n\n');
@@ -82,7 +75,7 @@ function buildProjects(entries) {
   for (const e of entries) {
     if (!e) continue;
     const context = e.context ? ` \\emph{$|$ ${escapeLatex(e.context)}}` : '';
-    const bullets = Array.isArray(e.bullets) ? e.bullets.map(b => `            \\resumeItem{${escapeLatex(b)}}`).join('\n') : '';
+    const bullets = Array.isArray(e.bullets) ? e.bullets.map(b => `            \\resumeItem{${renderLatexRich(b)}}`).join('\n') : '';
     blocks.push(`    \\resumeProjectHeading\n      {\\textbf{${escapeLatex(e.name)}}${context}}{${escapeLatex(e.dates)}}\n      \\resumeItemListStart\n${bullets}\n      \\resumeItemListEnd`);
   }
   return blocks.join('\n\n');
@@ -95,6 +88,46 @@ function buildSkills(categories) {
     const items = Array.isArray(c.items) ? c.items.join(', ') : (c.items || '');
     return `        \\textbf{${escapeLatex(c.category)}}{: ${escapeLatex(items)}} \\\\`;
   }).filter(Boolean).join('\n');
+}
+
+/**
+ * Publications renderer — one \resumeItem per entry, NO slice()/top-N (the full
+ * list always renders, mirroring build-cv-html.mjs). Entry may be a plain string
+ * or { text|citation, emphasis, venue, detail }: `emphasis` (e.g. the candidate's
+ * own name) is bolded at its first occurrence, `venue` is italicized.
+ */
+function buildPublications(entries) {
+  if (!Array.isArray(entries) || entries.length === 0) return '';
+  const items = [];
+  for (const p of entries) {
+    if (!p) continue;
+    if (typeof p === 'string') {
+      items.push(`            \\resumeItem{${escapeLatex(p)}}`);
+      continue;
+    }
+    let body = escapeLatex(p.text || p.citation || '');
+    if (p.emphasis) {
+      const emph = escapeLatex(p.emphasis);
+      const idx = body.indexOf(emph);
+      if (idx >= 0) body = `${body.slice(0, idx)}\\textbf{${emph}}${body.slice(idx + emph.length)}`;
+    }
+    const venue = p.venue ? ` \\textit{${escapeLatex(p.venue)}}` : '';
+    const detail = p.detail ? ` ${escapeLatex(p.detail)}` : '';
+    items.push(`            \\resumeItem{${body}${venue}${detail}}`);
+  }
+  return items.join('\n');
+}
+
+/**
+ * Full Publications section block, or '' when there are none. Returning the
+ * whole \section...\resumeSubHeadingListEnd (or nothing) keyed on emptiness
+ * avoids a compile-breaking empty itemize when a CV has no publications — the
+ * {{PUBLICATIONS_SECTION}} token in cv-template.tex collapses cleanly.
+ */
+function buildPublicationsSection(entries) {
+  const items = buildPublications(entries);
+  if (!items) return '';
+  return `\\section{Publications}\n  \\resumeSubHeadingListStart\n${items}\n  \\resumeSubHeadingListEnd`;
 }
 
 async function main() {
@@ -164,10 +197,11 @@ async function main() {
     EXPERIENCE: buildExperience(payload.experience),
     PROJECTS: buildProjects(payload.projects),
     SKILLS: buildSkills(payload.skills),
+    PUBLICATIONS_SECTION: buildPublicationsSection(payload.publications),
   };
 
   for (const [key, value] of Object.entries(substitutions)) {
-    template = template.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value);
+    template = template.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), () => value);
   }
 
   const unresolved = template.match(PLACEHOLDER_RE);
@@ -195,6 +229,7 @@ async function main() {
       experienceEntries: (payload.experience || []).length,
       projectEntries: (payload.projects || []).length,
       skillCategories: (payload.skills || []).length,
+      publicationEntries: (payload.publications || []).length,
       totalBullets: (() => {
         const ex = Array.isArray(payload.experience) ? payload.experience.flatMap(e => Array.isArray(e?.bullets) ? e.bullets : []) : [];
         const pr = Array.isArray(payload.projects) ? payload.projects.flatMap(p => Array.isArray(p?.bullets) ? p.bullets : []) : [];
@@ -244,6 +279,14 @@ async function runSelfTest() {
       { category: 'Languages', items: 'Python, JavaScript, TypeScript' },
       { category: 'Frameworks', items: 'FastAPI, React, PyTorch' },
     ],
+    publications: [
+      {
+        text: 'Doe, J.; Roe, R. A Study of Testing Methodologies.',
+        emphasis: 'Doe, J.',
+        venue: 'J. Testing',
+        detail: '2024, 12 (3), 45-67.',
+      },
+    ],
   };
 
   const testOutput = join(tmpdir(), 'build-cv-latex-test.tex');
@@ -281,10 +324,11 @@ async function runSelfTest() {
     EXPERIENCE: buildExperience(sample.experience),
     PROJECTS: buildProjects(sample.projects),
     SKILLS: buildSkills(sample.skills),
+    PUBLICATIONS_SECTION: buildPublicationsSection(sample.publications),
   };
 
   for (const [key, value] of Object.entries(substitutions)) {
-    template = template.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value);
+    template = template.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), () => value);
   }
 
   const unresolved = template.match(PLACEHOLDER_RE);
@@ -314,6 +358,7 @@ async function runSelfTest() {
       experienceEntries: sample.experience.length,
       projectEntries: sample.projects.length,
       skillCategories: sample.skills.length,
+      publicationEntries: sample.publications.length,
       totalBullets: (() => {
         const ex = Array.isArray(sample.experience) ? sample.experience.flatMap(e => Array.isArray(e?.bullets) ? e.bullets : []) : [];
         const pr = Array.isArray(sample.projects) ? sample.projects.flatMap(p => Array.isArray(p?.bullets) ? p.bullets : []) : [];
@@ -334,4 +379,7 @@ async function runSelfTest() {
   process.exit(0);
 }
 
-main();
+// Run the CLI only when executed directly, so Milestone 3's cv-trim.mjs can
+// import the build functions without kicking off argument parsing / process.exit.
+const isMain = import.meta.url === pathToFileURL(process.argv[1] || '').href;
+if (isMain) main();

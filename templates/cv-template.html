@@ -248,6 +248,25 @@
     margin-top: 3px;
   }
 
+  /* Project bullet lists reuse the work-experience bullet look so a project
+     with bullets renders consistently with a role (build-cv-html.mjs emits a
+     <ul> inside .project). */
+  .project ul {
+    padding-left: 18px;
+    margin-top: 4px;
+  }
+
+  .project li {
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 4px;
+  }
+
+  .project li strong {
+    font-weight: 600;
+  }
+
   /* === EDUCATION === */
   .edu-item {
     margin-bottom: 8px;
@@ -337,6 +356,25 @@
     font-size: 10.5px;
   }
 
+  /* === PUBLICATIONS ===
+     A real, structured section (not the .project/.skill-item markup that
+     hand-authored CVs used to fake it with). Each entry is one .pub-item line;
+     the candidate's own name renders in <strong>, the venue in <em>. */
+  .pub-item {
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: #333;
+    margin-bottom: 5px;
+  }
+
+  .pub-item strong {
+    font-weight: 600;
+  }
+
+  .pub-item em {
+    font-style: italic;
+  }
+
   /* === PRINT === */
   @media print {
     body {
@@ -358,14 +396,16 @@
 
   /* === PAGE BREAK CONTROL === */
   /* Only avoid breaking small atomic units (a cert row, an education line, the
-     header, a single competency or skill).  Sections and multi-bullet roles are
-     allowed to flow across a page boundary so content packs tight instead of
-     jumping wholesale and leaving large bottom gaps. */
+     header, a single competency or skill, one publication citation). Sections
+     and multi-bullet roles are allowed to flow across a page boundary so
+     content packs tight instead of jumping wholesale and leaving large bottom
+     gaps. */
   .header,
   .edu-item,
   .cert-item,
   .competency-tag,
-  .skill-item {
+  .skill-item,
+  .pub-item {
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -400,7 +440,8 @@
     background: linear-gradient(to left, hsl(187, 74%, 32%), hsl(270, 70%, 45%));
   }
 
-  html[lang="ar"] .job ul {
+  html[lang="ar"] .job ul,
+  html[lang="ar"] .project ul {
     padding-right: 18px;
     padding-left: 0;
   }
@@ -456,62 +497,23 @@
   <div class="header">
     <h1>{{NAME}}</h1>
     <div class="header-gradient"></div>
-    <div class="contact-row">
-      <a href="tel:{{PHONE}}">{{PHONE}}</a>
-      <span class="separator">|</span>
-      <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
-      <span class="separator">|</span>
-      <a href="{{LINKEDIN_URL}}">{{LINKEDIN_DISPLAY}}</a>
-      <span class="separator">|</span>
-      <a href="{{PORTFOLIO_URL}}">{{PORTFOLIO_DISPLAY}}</a>
-      <span class="separator">|</span>
-      <span>{{LOCATION}}</span>
-    </div>
+    <div class="contact-row">{{CONTACT_ROW}}</div>
   </div>
 
-  <!-- PROFESSIONAL SUMMARY -->
-  <div class="section">
-    <div class="section-title">{{SECTION_SUMMARY}}</div>
-    <div class="summary-text">{{SUMMARY_TEXT}}</div>
-  </div>
-
-  <!-- CORE COMPETENCIES -->
-  <div class="section">
-    <div class="section-title">{{SECTION_COMPETENCIES}}</div>
-    <div class="competencies-grid">
-      {{COMPETENCIES}}
-    </div>
-  </div>
-
-  <!-- WORK EXPERIENCE -->
-  <div class="section">
-    <div class="section-title">{{SECTION_EXPERIENCE}}</div>
-    {{EXPERIENCE}}
-  </div>
-
-  <!-- PROJECTS -->
-  <div class="section">
-    <div class="section-title">{{SECTION_PROJECTS}}</div>
-    {{PROJECTS}}
-  </div>
-
-  <!-- EDUCATION -->
-  <div class="section">
-    <div class="section-title">{{SECTION_EDUCATION}}</div>
-    {{EDUCATION}}
-  </div>
-
-  <!-- CERTIFICATIONS -->
-  <div class="section">
-    <div class="section-title">{{SECTION_CERTIFICATIONS}}</div>
-    <div class="cert-table">{{CERTIFICATIONS}}</div>
-  </div>
-
-  <!-- SKILLS -->
-  <div class="section">
-    <div class="section-title">{{SECTION_SKILLS}}</div>
-    {{SKILLS}}
-  </div>
+  <!-- SECTIONS: build-cv-html.mjs emits each as a full section div, or an empty
+       string when the payload has no entries for it, so an absent Projects,
+       Certifications, or Publications section leaves no stray heading. Canonical
+       order below; the rare section-level reorder is handled by the
+       hand-authored-HTML fallback documented in modes/pdf.md, not by this file.
+       (ASCII-only comment: the ATS normalizer scans the whole file.) -->
+  {{SUMMARY_SECTION}}
+  {{COMPETENCIES_SECTION}}
+  {{EXPERIENCE_SECTION}}
+  {{PROJECTS_SECTION}}
+  {{EDUCATION_SECTION}}
+  {{CERTIFICATIONS_SECTION}}
+  {{SKILLS_SECTION}}
+  {{PUBLICATIONS_SECTION}}
 
 </div>
 </body>
