@@ -104,7 +104,14 @@ export function validateTemplate(path, kind) {
   const cfg = KINDS[kind];
   if (!cfg) throw new Error(`Unknown template kind: ${kind}`);
   const text = readFileSync(path, 'utf-8');
-  const missing = cfg.required.filter((ph) => !text.includes(`{{${ph}}}`));
+  // Accept either the flat token ({{EXPERIENCE}}) or this instance's
+  // block-token variant ({{EXPERIENCE_SECTION}}): the local build-cv-html.mjs
+  // fills whole-section blocks so empty sections omit cleanly (no orphaned
+  // headings) and publications render as a first-class section. A template is
+  // usable when it carries either shape of the required placeholder.
+  const missing = cfg.required.filter(
+    (ph) => !text.includes(`{{${ph}}}`) && !text.includes(`{{${ph}_SECTION}}`)
+  );
   return { ok: missing.length === 0, missing };
 }
 
