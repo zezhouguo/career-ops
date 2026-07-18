@@ -40,6 +40,7 @@ portals.yml
 modes/_profile.md
 .update-dismissed
 .update-lock
+.manifesto-noted
 
 # Secrets (never commit — use .env.example as template)
 .env

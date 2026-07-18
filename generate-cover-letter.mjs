@@ -187,6 +187,8 @@ async function main() {
     options: {
       payload:     { type: "string" },
       out:         { type: "string" },
+      format:      { type: "string" },
+      report:      { type: "string" },
       help:        { type: "boolean", short: "h" },
       "max-pages": { type: "string" },
       "verify-text": { type: "boolean" },
@@ -198,10 +200,12 @@ async function main() {
   if (args.help || !args.payload) {
     console.log(`
 Usage:
-  node generate-cover-letter.mjs --payload payload.json [--out output/path.pdf] [--max-pages N] [--verify-text] [--jd-keywords k1,k2,...]
+  node generate-cover-letter.mjs --payload payload.json [--out output/path.pdf] [--format letter|a4] [--report NNN] [--max-pages N] [--verify-text] [--jd-keywords k1,k2,...]
 
   --payload      Path to the JSON payload file (required)
   --out          Override output path from payload (optional)
+  --format       Override output PDF page format (letter|a4, default: a4)
+  --report       Link the PDF to a tracker report number in data/pdf-index.tsv
   --max-pages    Flag (does not fail generation on) a PDF over N pages (default 1)
   --verify-text  Run ATS text-layer checks (contact info, keyword coverage) via pdf-text.mjs; requires pdftotext (poppler)
   --jd-keywords  Comma-separated keywords for --verify-text's coverage check
@@ -246,11 +250,13 @@ Usage:
     // contact line) rather than re-reading config/profile.yml separately.
     const contact = { email: payload.candidate?.email, phone: payload.candidate?.phone };
     await renderHtmlToPdf(html, outputPath, {
-      format: "a4",
+      format: args.format || "a4",
       maxPages,
       verifyText: !!args["verify-text"],
       jdKeywords,
       contact,
+      reportNum: args.report,
+      inputPath: payloadPath,
     });
     console.log(`\nCover letter PDF: ${payload.output_path}`);
   } catch (err) {
