@@ -34,6 +34,12 @@
 
 - **Language: converse in Chinese, produce documents in English.** All chat replies, explanations, and questions to me should be in Chinese (中文). But every created work-product stays in English regardless of chat language: CVs, cover letters, application-form answers, recruiter/outreach emails, reports, the tracker (`data/applications.md`), and any file content. (Rationale: US-based, English-language job search — documents must be in English to be usable.)
 
+- **Interview answers are adaptive, not fixed scripts.** Treat prior prepared answers and `interview-prep/story-bank.md` as factual source material, not as automatically optimal wording or a canonical answer. Before generating interview answers or an interview package, analyze the specific JD, company, role archetype, interview round, and likely audience; then select, reframe, and shorten the most relevant evidence. Do not copy a stored answer verbatim merely because it matches the question. Preserve the underlying facts and metrics, never embellish them, and explain why the chosen angle fits that particular interview.
+
+- **Tesla applications use Evidence of Excellence, not a cover letter.** For Tesla roles, do not generate or upload a cover letter. Build the package around the tailored CV, Tesla's Evidence of Excellence field, profile link, and the real form answers. If a Tesla form does not expose an Evidence of Excellence field, use the tailored CV and available profile-link/additional-information fields; do not create a cover letter unless I explicitly override this rule for a specific Tesla application.
+
+- **LinkedIn account has Premium.** For follow-up outreach to people outside the user's network, prepare both a full InMail/DM and a short connection note. Use InMail first for exact job posters, confirmed recruiters, and high-confidence hiring-side contacts on priority roles. Use a connection request for warm contacts, peers, and lower-confidence routing contacts. Do not assume the exact monthly InMail credit count because it depends on the Premium plan; rank the recommended InMails so the user can spend the available credits deliberately.
+
 ## Career-Pivot Intent — Apply-Line Override (set 2026-07-08)
 
 The user has **explicitly accepted a career pivot from battery R&D into semiconductor metrology / failure analysis (FA) / materials characterization, and into cross-industry general-materials-science R&D.** This is the "specific reason" the scoring bands reserve for the 3.5–3.9 range — and the user has chosen to extend it down to 3.0 for this role-class.
@@ -152,6 +158,7 @@ When I say something like **"search LinkedIn for '<keyword>', look at N results"
      - Save PDFs date-first: YYYY-MM-DD-company.pdf -->
 
 - **CVs: always show the COMPLETE publication list.** Never truncate to "Selected Publications" or a top-N subset. Every generated CV (for any role) must include my full publication list from `cv.md`, in the same order. Applies to all packages, not just one role.
+- **CV Publications typography is fixed.** In every generated HTML/PDF CV, render `.pub-item` at `9.7px` with `line-height: 1.24` and `margin-bottom: 1.5px`. Keep Publications single-column and ATS-readable, preserve every citation and DOI, and do not reduce these values further or switch to columns without my explicit approval. Use the recovered space for additional JD-relevant Experience bullets when the two-page cap permits.
 - **Cover letter greeting: avoid generic "Dear Hiring Team" when a more specific address is available.** Before defaulting to a generic greeting, check the JD/report for a named hiring manager, recruiter, or specific team/department (e.g. "electrochemical R&D team," "EVDD Hiring Team"). Prefer, in this order:
   1. A named individual, if one is actually given and it is appropriate to address them directly (e.g. a hiring manager named in the JD, or an employee who personally posted the recruiting call).
   2. The specific team/department name, if the JD names one (e.g. "Dear {Team Name} Team,").
@@ -181,6 +188,20 @@ Whenever I generate any application material (tailored CV, cover letter, applica
    - **"In Cover (where)"** names the slot: opening, profile paragraph, which selected bullet (bullet 1-4), or the "problems I'll solve" paragraph. Use ➖ when the evidence lives only in the CV.
    - **Gap rows are mandatory.** Every gap the JD exposes gets its own row showing how it is handled: in the CV it is normally ➖ (not surfaced, just closest evidence elevated); in the Cover state whether it is surfaced directly (claim/soften) or dropped, quoting the phrase used.
    - Principle: the CV carries the full searchable record (reordered, never flags gaps); the Cover carries selected evidence plus the wording that faces gaps head-on.
+
+6. **Application base-package completion gate (set 2026-07-16).** Treat a generated application base package as complete only after all four checks below have been performed and recorded. These are default deliverables, not optional extras, and the user does not need to request them again for each role:
+   - **Humanizer:** run the required draft → audit → final loop on every newly written narrative or connective passage, and record the final pass/fail result. Verbatim source bullets remain exempt as stated in rule 1.
+   - **JD mapping:** include the exact JD-to-material comparison table required by rules 2 and 5, including mandatory gap rows and the final claim/soften/drop handling.
+   - **Keyword match:** report a transparent keyword-matching score with numerator and denominator. Separate full-priority JD coverage from supported-keyword accuracy when unsupported terms would otherwise inflate the result; never count a gap disclosure as proof of past experience.
+   - **Content score:** assign a 0-100 content score and briefly state the deductions. At minimum assess factual support, role relevance, keyword coverage, clarity/scanability, and gap honesty.
+   Store these results in the role's `output/apply-packet-{slug}-{date}.md` and summarize them in the tracker note when the package is completed. If a package legitimately omits a cover letter (for example, Tesla or a form with no cover upload), mark the Cover column as ➖ and score the materials that actually exist rather than treating the package as incomplete.
+
+7. **Use selectable push questions for review and gap decisions (set 2026-07-16).** Whenever the active client or CLI exposes a native interactive-question control, use it instead of asking the user to type coded replies for package review, structural choices, and every `claim / soften / drop` gap decision.
+   - Present 2-3 mutually exclusive choices, place the recommended choice first, label it `(Recommended)`, and give one short consequence or tradeoff for each option. Keep a free-form `Other` path available when the client supplies one.
+   - Group no more than three related decisions into one pushed question panel. Split larger gap sets into multiple panels so each choice remains readable.
+   - For factual claims, gap handling, structural tradeoffs, and final document approval, require an explicit user selection. Do not auto-resolve or silently choose a default.
+   - After presenting a draft or audit, prefer a pushed review choice such as `Approve`, `Revise`, or `Explain a concern` rather than requiring the user to type an approval phrase.
+   - If the current client, mode, or CLI does not provide an interactive-question control, say so briefly once and fall back to a concise text question. Do not pretend a push control was sent when it was unavailable.
 
 ## Off-Limits
 

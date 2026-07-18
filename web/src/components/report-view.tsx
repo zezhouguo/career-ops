@@ -73,11 +73,13 @@ function splitSections(body: string): { intro: string; sections: Section[] } {
 
 export function ReportView({
   id,
+  reportId = id,
   app,
   report,
   canDelete = false,
 }: {
   id: string;
+  reportId?: string;
   app: Application | null;
   report: string | null;
   /** kept in the props contract (the page passes it) but no longer surfaced —
@@ -102,7 +104,10 @@ export function ReportView({
       </Link>
 
       <header className="mt-5">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-faint">#{id}</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-faint">
+          Report #{reportId}
+          {reportId !== id ? ` · Tracker #${id}` : ""}
+        </p>
         <div className="mt-2 flex items-center gap-3">
           <CompanyLogo name={app?.company ?? meta?.title ?? `Report #${id}`} size={40} />
           <h1 className="font-display text-3xl tracking-tight text-landing">
@@ -240,7 +245,7 @@ export function ReportView({
       ) : (
         <div className="mt-8 flex items-center gap-3 rounded-2xl border border-dashed border-border bg-surface/30 p-5 text-sm text-muted">
           <FileText className="size-5 shrink-0 text-faint" />
-          No report file found for #{id} in <code className="text-foreground">reports/</code>.
+          No report file found for #{reportId} in <code className="text-foreground">reports/</code>.
         </div>
       )}
     </div>

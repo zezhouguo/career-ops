@@ -35,6 +35,8 @@ Dissertation: **"Enabling High-Energy Lithium-Metal Batteries with High-Nickel C
 
 **Synthesis / materials:** continuous **hydroxide co-precipitation** in a **10 L stirred-tank reactor** (pH 11.0–11.6, 50 °C, 650 rpm, 10–12 µm secondary particles) for Ni(OH)₂ and doped precursors → two-step O₂ calcination (500 °C/5 h then 655–810 °C/12 h, Li/TM = 1.02) to layered oxides (LNO, NC-95, NM-95, NA-95, NMg-95, NMC622/811/90); sol-gel; **electrolyte formulation** (LP57 carbonate, HCE, LHCE design); glovebox handling (<0.01 ppm O₂/H₂O); slurry casting (90:5:5 active:C65:PVDF in NMP), calendering to ~3.0 g/cm³, ~2.0 mAh/cm² loading.
 
+**Electrolyte-additive screening:** performed additive screening with a formulation workflow transferable across electrode systems, owning the experimental path from formulation design through electrolyte preparation and cell evaluation. This supports additive-engineering claims, but does not by itself establish pilot- or production-scale electrolyte manufacturing ownership.
+
 **Cell formats:** CR2032 coin half-cells; Li|Cu & Li|Li symmetric; anode-free Cu|LNO; single-layer **pouch full cells** (graphite and Li-metal, N/P ≈ 1.1); LFP-counter GEIS cells.
 
 **Interphase / materials characterization:** XRD (ex-situ + **in-situ XRD**, Rietveld), **XPS** with Ar⁺ depth profiling, **ToF-SIMS** (depth profiles, 3D reconstruction, 2D maps, **FIB cross-sections**, NSD colocalization), **SEM** (ion-milled cross-section + top-view), **TEM** (cathode-surface structural reconstruction to rock-salt/spinel phases, compared across cathode compositions and states of charge/cycling), **AFM** (Li-metal deposition surface morphology as a function of electrolyte), **OEMS**, **DSC/TGA**, **FT-IR**, **⁷Li / ¹⁹F NMR**, ICP/BET, potentiometric H-cell solvation energy.
@@ -54,6 +56,7 @@ Dissertation: **"Enabling High-Energy Lithium-Metal Batteries with High-Nickel C
 - **Proof points:**
   - Delivered the first direct experimental evidence of anode-to-cathode crossover in Li-metal batteries.
   - Engineered a delithiated-LFP GEIS + DRT protocol to isolate cathode-only impedance inside full pouch cells.
+  - Designed temperature- and rate-accelerated aging test plans for the crossover study, then owned the data analysis, Arrhenius performance-prediction model, and result validation.
   - Combined DRT, depth-XPS, and 3D ToF-SIMS/FIB to show Li-metal pairing thickens the cathode CEI and raises charge-transfer resistance — most on high-Ni NMC90.
   - Used TEM to resolve cathode-surface structural degradation into rock-salt and spinel phases, comparing the reconstruction across cathode compositions and states of charge/cycling.
   - Reframed durable-LMB design around cross-interface (not single-electrode) stability.
@@ -95,7 +98,9 @@ Dissertation: **"Enabling High-Energy Lithium-Metal Batteries with High-Nickel C
 
 ## Contributing co-author papers (frame as contributions to team efforts)
 
-**Cui, *Adv. Mater.* 2024, 36(33), e2402420 — residual alkaline on high-Ni** *(explicit contribution: Guo co-did synthesis, residual-Li titration, electrochemistry, physicochemical characterization; co-wrote)*. UT Austin–PNNL collaboration; quantified surface residual-Li evolution and cathode–water activation energies (22–36 kJ/mol across LNO/NC/NM/NA); demonstrated a single-step re-calcination that restores aged cathodes.
+**Cui, *Adv. Mater.* 2024, 36(33), e2402420 — residual alkaline on high-Ni** *(explicit contribution: Guo co-did synthesis, residual-Li titration, electrochemistry, physicochemical characterization; co-wrote)*. UT Austin–PNNL collaboration; quantified surface residual-Li evolution and cathode–water activation energies (22–36 kJ/mol across LNO/NC/NM/NA); demonstrated a single-step re-calcination that restores aged cathodes. Guo confirmed that titration was used extensively in this residual-lithium study.
+
+**Analytical-method confirmation for application materials (user-confirmed 2026-07-18):** During his Ph.D. research, Guo used UV-Vis to measure the extent of transition-metal and polysulfide dissolution in electrolyte samples. He used acid-base titration to quantify residual alkaline compounds in the published residual-lithium study above and has hands-on skill in redox titration for determining transition-metal oxidation states. Keep these claims method-specific; do not imply broader spectroscopy or titration-platform ownership without further evidence.
 
 **Cui, *Adv. Energy Mater.* 2023, 13(12), 2203853 — intrinsic dopant roles in high-Ni** (contribution not itemized). Isolated Co/Mn/Al roles at identical Ni content under both cutoff-voltage and cutoff-energy-density protocols; ≥97.9% retention over 300 cycles in LNO/NC/NA LHCE pouch cells; reframed the case for Co in Co-free design.
 
